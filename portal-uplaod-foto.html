@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Foto Siswa - Comfort & Glow</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['Fira Code', 'monospace'],
+                        cyber: ['Orbitron', 'sans-serif'],
+                    },
+                    colors: {
+                        'void': '#050505',
+                        'cyber-dark': '#0a0f14',
+                        'glass': 'rgba(15, 23, 42, 0.6)',
+                        'neon-blue': '#00f3ff',
+                        'neon-green': '#00ff9d',
+                        'neon-red': '#ff0055',
+                    },
+                    boxShadow: {
+                        'neon-blue': '0 0 10px rgba(0, 243, 255, 0.5)',
+                        'neon-green': '0 0 10px rgba(0, 255, 157, 0.5)',
+                        'neon-red': '0 0 20px rgba(255, 0, 85, 0.6)',
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-out',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Orbitron:wght@400;500;700&family=Fira+Code:wght@400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        /* CYBER THEME BASE */
+        body {
+            background-color: #050505;
+            background-image: radial-gradient(circle at 15% 50%, rgba(0, 243, 255, 0.08) 0%, transparent 25%), radial-gradient(circle at 85% 30%, rgba(0, 255, 157, 0.08) 0%, transparent 25%);
+            background-attachment: fixed;
+            color: #e2e8f0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .cyber-card {
+            background: rgba(10, 15, 20, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(0, 243, 255, 0.15);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            position: relative;
+            overflow: hidden;
+        }
+        .cyber-card::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 2px;
+            background: linear-gradient(90deg, transparent, #00f3ff, transparent); opacity: 0.7;
+        }
+
+        .cyber-input {
+            background: rgba(0, 0, 0, 0.4); 
+            border: 1px solid #1e293b; 
+            color: #00f3ff; 
+            font-family: 'Fira Code', monospace; 
+            transition: all 0.3s ease;
+        }
+        .cyber-input:focus { 
+            border-color: #00f3ff; 
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.2); 
+            outline: none; 
+        }
+
+        .btn-cyber {
+            background: transparent; 
+            border: 1px solid #00f3ff; 
+            color: #00f3ff; 
+            font-family: 'Orbitron', sans-serif; 
+            letter-spacing: 1px; 
+            transition: all 0.3s ease;
+        }
+        .btn-cyber:hover { 
+            background: rgba(0, 243, 255, 0.1); 
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.4); 
+        }
+        
+        .btn-cyber-primary {
+            background: linear-gradient(45deg, #00f3ff, #0066ff); 
+            border: none; 
+            color: black; 
+            font-weight: bold;
+            font-family: 'Orbitron', sans-serif; 
+        }
+        .btn-cyber-primary:hover { 
+            box-shadow: 0 0 25px rgba(0, 243, 255, 0.6); 
+            transform: translateY(-2px); 
+        }
+        
+        .btn-cyber-success {
+            background: linear-gradient(45deg, #00ff9d, #00cc7a); 
+            border: none; 
+            color: black; 
+            font-weight: bold;
+            font-family: 'Orbitron', sans-serif; 
+        }
+        .btn-cyber-success:hover {
+            box-shadow: 0 0 25px rgba(0, 255, 157, 0.6); 
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-6">
+
+    <div class="cyber-card w-full max-w-md rounded-2xl overflow-hidden relative">
+        
+        <!-- Header -->
+        <div class="p-8 text-center border-b border-white/10">
+            <h1 class="text-2xl font-bold font-cyber text-neon-blue tracking-wider mb-1">PORTAL FOTO</h1>
+            <p class="text-cyan-500/70 text-xs font-mono tracking-widest">DATA BASE SISWA V5.1</p>
+        </div>
+
+        <div class="p-8 space-y-6 min-h-[300px]">
+            
+            <!-- Step 1: Input NIS -->
+            <div id="step-1" class="space-y-6 animate-fade-in">
+                <div class="text-center mb-4">
+                    <div class="w-16 h-16 bg-cyan-900/20 border border-neon-blue/30 rounded-full flex items-center justify-center mx-auto mb-4 shadow-[0_0_15px_rgba(0,243,255,0.2)]">
+                        <svg class="w-8 h-8 text-neon-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0c0 .883-.393 1.627-1 1.94a.5.5 0 01-.65-.65l2-5a.5.5 0 01.11-.17l5 5c.42.5.45 1.22-.07 1.67a.5.5 0 01-.65.05L14 6"></path></svg>
+                    </div>
+                    <p class="text-sm text-gray-400 font-mono">MASUKKAN NIS UNTUK VERIFIKASI</p>
+                </div>
+                <div>
+                    <input type="tel" id="input-nis" class="cyber-input w-full p-4 rounded-xl text-center text-xl font-bold tracking-widest" placeholder="NIS SISWA">
+                </div>
+                <button onclick="checkNIS()" id="btn-check" class="btn-cyber-primary w-full py-4 rounded-xl shadow-neon-blue transition-all">
+                    LANJUT
+                </button>
+            </div>
+
+            <!-- Step 2: Upload Area (Hidden) -->
+            <div id="step-2" class="hidden space-y-6 animate-fade-in">
+                <div class="text-center border-b border-white/10 pb-4">
+                    <p class="text-[10px] text-neon-green uppercase tracking-[0.2em] font-bold mb-1">DATA TERVERIFIKASI</p>
+                    <h3 id="student-name" class="text-xl font-bold font-cyber text-white">NAMA SISWA</h3>
+                    <span id="student-class" class="text-xs font-mono text-neon-blue bg-cyan-900/30 border border-neon-blue/30 px-3 py-1 rounded mt-2 inline-block">KELAS -</span>
+                </div>
+
+                <div class="relative group">
+                    <label class="flex flex-col items-center justify-center w-full h-64 border-2 border-dashed border-cyan-500/30 rounded-2xl cursor-pointer bg-black/20 hover:bg-cyan-900/10 hover:border-neon-blue transition-all overflow-hidden relative">
+                        
+                        <!-- Preview Image Container -->
+                        <div id="preview-container" class="absolute inset-0 z-10 hidden bg-black">
+                            <img id="preview-img" class="w-full h-full object-contain opacity-80">
+                            <div class="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-[2px] opacity-0 hover:opacity-100 transition-opacity">
+                                <span class="btn-cyber px-4 py-2 rounded text-xs font-bold bg-black/80">KETUK UNTUK GANTI</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Placeholder -->
+                        <div class="flex flex-col items-center justify-center pt-5 pb-6 z-0 group-hover:scale-105 transition-transform duration-300">
+                            <div class="w-16 h-16 bg-cyan-900/20 border border-cyan-500/30 text-neon-blue rounded-full flex items-center justify-center mb-3">
+                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                            </div>
+                            <p class="text-sm text-gray-300 font-bold font-cyber">FOTO / GALERI</p>
+                            <p class="text-[10px] text-gray-500 mt-1 font-mono">AUTO COMPRESS &lt; 500KB</p>
+                        </div>
+                        
+                        <!-- Input File -->
+                        <input type="file" id="file-input" class="hidden" accept="image/*">
+                    </label>
+                </div>
+
+                <div class="flex gap-3">
+                    <button onclick="location.reload()" class="flex-1 py-3 border border-gray-600 rounded-xl text-gray-400 hover:text-white hover:border-white font-bold transition-colors text-sm font-cyber">BATAL</button>
+                    <button onclick="uploadPhoto()" id="btn-upload" class="flex-[2] btn-cyber-success rounded-xl shadow-neon-green transition-all transform active:scale-95 disabled:opacity-50 disabled:shadow-none disabled:cursor-not-allowed flex items-center justify-center gap-2" disabled>
+                        <span>SIMPAN</span>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Success State -->
+            <div id="step-success" class="hidden text-center py-8 animate-fade-in">
+                <div class="w-24 h-24 bg-green-900/20 border border-neon-green text-neon-green rounded-full flex items-center justify-center mx-auto mb-6 shadow-[0_0_30px_rgba(0,255,157,0.3)]">
+                    <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                </div>
+                <h3 class="text-2xl font-bold font-cyber text-white mb-2 tracking-wide">UPLOAD SUKSES</h3>
+                <p class="text-gray-400 text-sm mb-8 font-mono">Foto profil berhasil diperbarui ke server.</p>
+                <button onclick="location.reload()" class="btn-cyber px-8 py-3 rounded-full text-sm font-bold">TUTUP HALAMAN</button>
+            </div>
+
+        </div>
+        
+        <!-- Loading Overlay -->
+        <div id="loading-overlay" class="absolute inset-0 bg-black/90 flex flex-col items-center justify-center z-50 hidden backdrop-blur-sm">
+            <div class="w-16 h-16 border-4 border-neon-blue border-t-transparent rounded-full animate-spin mb-6 shadow-[0_0_20px_rgba(0,243,255,0.4)]"></div>
+            <p class="text-neon-blue font-bold font-cyber animate-pulse tracking-widest text-sm" id="loading-text">MEMPROSES DATA...</p>
+        </div>
+
+    </div>
+    
+    <div class="mt-8 text-center text-gray-600 text-[10px] font-mono">
+        <p>SECURE SYSTEM V5.1 &copy; 2025</p>
+    </div>
+
+    <!-- Logic -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getStorage, ref, uploadString, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
+
+        // KONFIGURASI FIREBASE ANDA
+        const firebaseConfig = {
+            apiKey: "AIzaSyAwIwimlyrE4qQqYa2gA8Pfygd59USsveQ",
+            authDomain: "aplikasi-ulangan-01.firebaseapp.com",
+            projectId: "aplikasi-ulangan-01",
+            storageBucket: "aplikasi-ulangan-01.firebasestorage.app",
+            messagingSenderId: "409085062439",
+            appId: "1:409085062439:web:280589d1a3e12e7b980d02",
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const storage = getStorage(app);
+        const auth = getAuth(app);
+
+        let currentStudentId = null;
+        let compressedImageBase64 = null;
+
+        // AUTHENTICATION INIT (PENTING AGAR TIDAK ERROR PERMISSION)
+        (async function() {
+            try {
+                await signInAnonymously(auth);
+                console.log("Connected as Anonymous");
+            } catch (error) {
+                console.error("Auth Error:", error);
+            }
+        })();
+
+        // FUNGSI 1: Cek NIS di Database
+        window.checkNIS = async () => {
+            const nisInput = document.getElementById('input-nis');
+            const nis = nisInput.value.trim();
+            
+            if(!nis) { alert("MOHON ISI NIS!"); return; }
+            
+            showLoading(true, "MENCARI DATA...");
+            
+            try {
+                const docRef = doc(db, 'siswa', nis);
+                const docSnap = await getDoc(docRef);
+
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    currentStudentId = nis; 
+                    
+                    document.getElementById('student-name').textContent = data.nama.toUpperCase();
+                    document.getElementById('student-class').textContent = data.kelas || 'UMUM';
+                    
+                    document.getElementById('step-1').classList.add('hidden');
+                    document.getElementById('step-2').classList.remove('hidden');
+                } else {
+                    alert("NIS TIDAK DITEMUKAN DI DATABASE.");
+                    nisInput.value = '';
+                    nisInput.focus();
+                }
+            } catch (e) {
+                console.error(e);
+                alert("ERROR KONEKSI (Cek Internet/Database): " + e.message);
+            } finally {
+                showLoading(false);
+            }
+        };
+
+        // FUNGSI 2: Handle File Input & Kompresi
+        document.getElementById('file-input').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            showLoading(true, "MENGOMPRESI FOTO...");
+
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const img = new Image();
+                img.src = event.target.result;
+                
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    
+                    const maxWidth = 500;
+                    const scale = maxWidth / img.width;
+                    
+                    canvas.width = maxWidth;
+                    canvas.height = img.height * scale;
+                    
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    compressedImageBase64 = canvas.toDataURL('image/jpeg', 0.7);
+                    
+                    const previewImg = document.getElementById('preview-img');
+                    previewImg.src = compressedImageBase64;
+                    document.getElementById('preview-container').classList.remove('hidden');
+                    
+                    const btnUpload = document.getElementById('btn-upload');
+                    btnUpload.disabled = false;
+                    btnUpload.classList.remove('opacity-50', 'cursor-not-allowed', 'disabled:shadow-none');
+                    
+                    showLoading(false);
+                };
+            };
+            reader.readAsDataURL(file);
+        });
+
+        // FUNGSI 3: Upload ke Storage & Update Firestore
+        window.uploadPhoto = async () => {
+            if (!currentStudentId || !compressedImageBase64) return;
+
+            showLoading(true, "MENGUPLOAD KE SERVER...");
+
+            try {
+                const storageRef = ref(storage, `foto_siswa/${currentStudentId}.jpg`);
+                await uploadString(storageRef, compressedImageBase64, 'data_url');
+                const downloadURL = await getDownloadURL(storageRef);
+                
+                const studentRef = doc(db, 'siswa', currentStudentId);
+                await updateDoc(studentRef, {
+                    foto: downloadURL,
+                    updated_at: serverTimestamp()
+                });
+
+                document.getElementById('step-2').classList.add('hidden');
+                document.getElementById('step-success').classList.remove('hidden');
+
+            } catch (error) {
+                console.error("Upload error:", error);
+                // Pesan error user-friendly
+                if(error.code === 'storage/unauthorized') {
+                    alert("GAGAL: Izin ditolak. Hubungi Admin untuk membuka akses Storage.");
+                } else {
+                    alert("GAGAL UPLOAD: " + error.message);
+                }
+            } finally {
+                showLoading(false);
+            }
+        };
+
+        function showLoading(show, text = "MEMPROSES...") {
+            const overlay = document.getElementById('loading-overlay');
+            const txt = document.getElementById('loading-text');
+            if (show) {
+                txt.textContent = text;
+                overlay.classList.remove('hidden');
+            } else {
+                overlay.classList.add('hidden');
+            }
+        }
+    </script>
+</body>
+</html>

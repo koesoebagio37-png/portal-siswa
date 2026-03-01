@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="id" class="antialiased">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Presensi Kelas - Comfort & Glow</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <!-- Library QR Scanner -->
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class', 
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                        cyber: ['Orbitron', 'sans-serif'],
+                    },
+                    colors: {
+                        'deep': '#0f172a', 'surface': '#1e293b', 'primary': '#38bdf8',
+                        'accent': '#818cf8', 'success': '#34d399', 'warning': '#fbbf24', 'danger': '#f87171',
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.4s ease-out forwards',
+                        'float': 'float 6s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        fadeIn: { '0%': { opacity: '0', transform: 'translateY(10px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } },
+                        float: { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-10px)' } }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400;700&family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(52, 211, 153, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(56, 189, 248, 0.15) 0px, transparent 50%);
+            background-attachment: fixed;
+            -webkit-tap-highlight-color: transparent;
+        }
+        html.dark body {
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(52, 211, 153, 0.1) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(56, 189, 248, 0.1) 0px, transparent 50%);
+        }
+
+        /* PREMIUM GLASS STYLE */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+        }
+        html.dark .glass-panel {
+            background: rgba(30, 41, 59, 0.70);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+        }
+
+        .glow-input {
+            background: rgba(255, 255, 255, 0.6);
+            border: 1px solid #cbd5e1;
+            color: #1e293b;
+            transition: all 0.3s ease;
+        }
+        .glow-input:focus {
+            border-color: #34d399;
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 0 25px rgba(52, 211, 153, 0.2);
+            outline: none;
+        }
+        html.dark .glow-input {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid #334155;
+            color: #ffffff;
+        }
+        html.dark .glow-input:focus {
+            border-color: #34d399;
+            background: rgba(15, 23, 42, 0.9);
+            box-shadow: 0 0 25px rgba(52, 211, 153, 0.15);
+        }
+
+        /* App Container */
+        .app-container {
+            max-width: 480px;
+            margin: 0 auto;
+            min-height: 100vh;
+            position: relative;
+            padding-bottom: 90px;
+        }
+        
+        .view-section { display: none; }
+        .view-section.active { display: flex; animation: fadeIn 0.4s ease-out forwards; }
+        
+        .page { display: none; animation: fadeIn 0.4s ease-out forwards; }
+        .page.active { display: block; }
+        
+        .nav-item { color: #64748b; transition: all 0.3s; }
+        html.dark .nav-item { color: #94a3b8; }
+        .nav-item.active { color: #34d399; text-shadow: 0 0 10px rgba(52, 211, 153, 0.5); }
+        .nav-item.active i { font-weight: bold; transform: scale(1.15) translateY(-2px); }
+        
+        .card-press { transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.15s; }
+        .card-press:active { transform: scale(0.96); box-shadow: none; }
+
+        /* Custom Reader UI */
+        #reader__dashboard_section_csr span, #reader__dashboard_section_swaplink { color: #34d399 !important; }
+        #reader button { background: #34d399 !important; color: #0f172a !important; border-radius: 8px; padding: 5px 15px; font-weight: bold; border: none; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 dark:bg-[#0f172a] dark:text-[#f8fafc] transition-colors duration-500">
+
+    <!-- Ambient Background Animation -->
+    <div class="fixed inset-0 w-full h-full overflow-hidden pointer-events-none z-0">
+        <div class="absolute top-[-10%] left-[-10%] w-[400px] h-[400px] bg-success/10 rounded-full blur-[100px] animate-float"></div>
+        <div class="absolute bottom-[-10%] right-[-10%] w-[400px] h-[400px] bg-primary/10 rounded-full blur-[100px] animate-float" style="animation-delay: 3s"></div>
+    </div>
+
+    <div class="app-container relative z-10">
+
+        <!-- LOADING SCREEN -->
+        <div id="loading-screen" class="fixed inset-0 bg-slate-50/90 dark:bg-deep/90 z-[100] flex flex-col items-center justify-center backdrop-blur-md transition-opacity duration-500">
+            <div class="w-20 h-20 border-4 border-slate-300 dark:border-slate-700 border-t-success rounded-full animate-spin mb-6"></div>
+            <p class="text-sm text-success font-mono font-bold tracking-[0.2em] uppercase animate-pulse">Menghubungkan Server...</p>
+        </div>
+
+        <!-- 1. VIEW LOGIN -->
+        <div id="view-login" class="view-section flex-col items-center justify-center min-h-screen p-6">
+            <div class="glass-panel rounded-3xl p-8 w-full text-center relative overflow-hidden shadow-2xl">
+                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-success via-emerald-400 to-success"></div>
+                
+                <div class="w-20 h-20 bg-success/10 text-success rounded-2xl flex items-center justify-center mx-auto mb-6 border border-success/20 shadow-[0_0_20px_rgba(52,211,153,0.2)]">
+                    <i class="ph ph-chalkboard-teacher text-5xl"></i>
+                </div>
+                
+                <h1 class="text-2xl font-bold font-cyber tracking-tight text-slate-900 dark:text-white mb-2">PRESENSI KELAS</h1>
+                <p class="text-slate-500 dark:text-slate-400 text-xs tracking-widest uppercase mb-10">Sistem Absensi Guru Mapel</p>
+
+                <form onsubmit="app.login(event)" class="w-full space-y-6">
+                    <div>
+                        <input type="tel" id="input-nis" oninput="app.formatNIS(this)" maxlength="11"
+                            class="glow-input w-full p-5 rounded-2xl text-center text-xl font-bold font-mono tracking-[0.2em] placeholder-slate-400 dark:placeholder-slate-500" 
+                            placeholder="NIS SISWA">
+                        <p class="text-[10px] text-slate-500 dark:text-slate-400 mt-2 text-center">*Ketik angka saja, titik otomatis muncul.</p>
+                    </div>
+                    
+                    <button type="submit" id="btn-login-submit" class="w-full py-4 rounded-2xl bg-gradient-to-r from-success to-emerald-600 hover:to-teal-500 text-white font-bold shadow-lg shadow-success/30 transition-all transform active:scale-95 tracking-wider uppercase text-sm">
+                        Masuk Sistem
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- 2. MAIN APP WRAPPER -->
+        <div id="main-app" class="hidden flex-col min-h-screen">
+            
+            <!-- HEADER -->
+            <header class="pt-10 pb-6 px-6 glass-panel sticky top-0 z-40 rounded-b-3xl shadow-[0_10px_30px_-10px_rgba(0,0,0,0.1)] dark:shadow-[0_10px_30px_-10px_rgba(0,0,0,0.5)]">
+                <!-- Theme Toggle -->
+                <button onclick="window.toggleTheme()" class="absolute top-6 right-6 p-2 bg-slate-200/50 dark:bg-slate-800/50 rounded-xl text-slate-600 dark:text-slate-300 hover:text-success transition-all border border-white/20">
+                    <i class="ph ph-moon dark:hidden text-lg"></i>
+                    <i class="ph ph-sun hidden dark:block text-lg"></i>
+                </button>
+
+                <div class="flex items-center gap-4 mt-2">
+                    <div class="w-12 h-12 rounded-full bg-gradient-to-br from-success to-emerald-600 flex items-center justify-center text-white font-bold text-xl shadow-lg border-2 border-white/20" id="header-avatar">
+                        S
+                    </div>
+                    <div class="flex-1 overflow-hidden">
+                        <h2 id="display-name" class="text-lg font-bold text-slate-900 dark:text-white truncate">Nama Siswa</h2>
+                        <div class="flex items-center gap-2 mt-1">
+                            <span class="px-2 py-0.5 bg-success/10 border border-success/20 text-success text-[10px] font-bold rounded-full uppercase tracking-wider flex items-center gap-1" id="header-class">
+                                Kelas
+                            </span>
+                            <span id="header-nis" class="text-xs font-mono text-slate-500 dark:text-slate-400">NIS</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- HALAMAN: BERANDA -->
+            <div id="page-home" class="page active p-6 space-y-6">
+                <!-- Banner Status (Izin Global) -->
+                <div id="status-banner" class="glass-panel p-6 rounded-3xl text-center relative overflow-hidden transition-all duration-500 shadow-lg border-l-4 border-l-primary">
+                    <div class="relative z-10">
+                        <p class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1">Status Hari Ini</p>
+                        <h3 class="text-2xl font-bold font-cyber tracking-tight text-slate-900 dark:text-white text-primary" id="home-status">Siap Belajar</h3>
+                        <p class="text-slate-500 dark:text-slate-400 text-xs mt-2" id="home-desc">Masukkan kode atau scan QR dari Guru Mapel.</p>
+                    </div>
+                </div>
+
+                <!-- Menu Grid -->
+                <div class="grid grid-cols-2 gap-4">
+                    <button onclick="app.openManualInput()" class="card-press block glass-panel p-5 rounded-3xl border border-white/20 hover:border-accent/50 relative overflow-hidden group col-span-2">
+                        <div class="absolute -right-4 -top-4 w-20 h-20 bg-accent/10 rounded-full blur-xl group-hover:bg-accent/20 transition-all"></div>
+                        <div class="flex items-center gap-4 relative z-10">
+                            <div class="w-12 h-12 bg-accent/10 text-accent rounded-2xl flex items-center justify-center text-2xl border border-accent/20 shadow-inner">
+                                <i class="ph ph-keyboard"></i>
+                            </div>
+                            <div class="text-left">
+                                <h4 class="font-bold text-sm text-slate-800 dark:text-white leading-tight mb-1">Input Kode Manual</h4>
+                                <p class="text-[10px] text-slate-500 dark:text-slate-400">Ketik kode dari Guru Mapel</p>
+                            </div>
+                        </div>
+                    </button>
+                    
+                    <button onclick="app.openScanner()" class="card-press block glass-panel p-5 rounded-3xl border border-white/20 hover:border-primary/50 relative overflow-hidden group col-span-2">
+                        <div class="absolute -right-4 -top-4 w-20 h-20 bg-primary/10 rounded-full blur-xl group-hover:bg-primary/20 transition-all"></div>
+                        <div class="flex items-center gap-4 relative z-10">
+                            <div class="w-12 h-12 bg-primary/10 text-primary rounded-2xl flex items-center justify-center text-2xl border border-primary/20 shadow-inner">
+                                <i class="ph ph-qr-code"></i>
+                            </div>
+                            <div class="text-left">
+                                <h4 class="font-bold text-sm text-slate-800 dark:text-white leading-tight mb-1">Scan QR Code</h4>
+                                <p class="text-[10px] text-slate-500 dark:text-slate-400">Pindai QR dari layar proyektor</p>
+                            </div>
+                        </div>
+                    </button>
+                </div>
+                
+                <!-- Info Tambahan -->
+                <div class="p-4 bg-primary/5 border border-primary/20 rounded-2xl text-center mt-4">
+                    <p class="text-[10px] text-slate-600 dark:text-slate-400 leading-relaxed">
+                        <b>Info Penting:</b> Jika Anda tidak hadir karena Sakit/Izin, silakan ajukan laporan melalui <b class="text-primary">Aplikasi Presensi Piket</b>.
+                    </p>
+                </div>
+            </div>
+
+            <!-- HALAMAN: PROFIL -->
+            <div id="page-profile" class="page hidden p-6">
+                <div class="glass-panel p-8 rounded-3xl text-center relative overflow-hidden">
+                    <div class="absolute -left-10 -bottom-10 w-40 h-40 bg-danger/10 rounded-full blur-3xl"></div>
+                    
+                    <div class="w-24 h-24 bg-gradient-to-br from-success to-emerald-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-4xl border-4 border-white/20 shadow-xl relative z-10 font-bold" id="profile-avatar">
+                        ?
+                    </div>
+                    <h3 id="profile-name" class="text-xl font-bold text-slate-900 dark:text-white relative z-10">...</h3>
+                    <p id="profile-nis" class="text-success text-sm font-mono mb-8 relative z-10">...</p>
+                    
+                    <button onclick="app.logout()" class="w-full py-4 text-danger font-bold bg-danger/10 border border-danger/20 rounded-2xl hover:bg-danger hover:text-white transition-all transform active:scale-95 tracking-widest uppercase text-sm relative z-10">
+                        <i class="ph ph-sign-out mr-2"></i> Keluar Akun
+                    </button>
+                </div>
+                
+                <div class="text-center text-[10px] text-slate-400 dark:text-slate-500 font-mono mt-8 uppercase tracking-widest">
+                    Class Attendance v2.0
+                </div>
+            </div>
+
+            <!-- MENU NAVIGASI BAWAH -->
+            <nav class="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-[480px] glass-panel border-t border-white/20 flex justify-around py-3 pb-8 z-50 rounded-t-3xl">
+                <button onclick="app.switchPage('home')" class="nav-item active flex flex-col items-center gap-1.5 w-20 py-2">
+                    <i class="ph ph-house text-[26px]"></i>
+                    <span class="text-[10px] font-bold uppercase tracking-widest">Beranda</span>
+                </button>
+                <button onclick="app.switchPage('profile')" class="nav-item flex flex-col items-center gap-1.5 w-20 py-2">
+                    <i class="ph ph-user text-[26px]"></i>
+                    <span class="text-[10px] font-bold uppercase tracking-widest">Profil</span>
+                </button>
+            </nav>
+        </div>
+    </div>
+
+    <!-- MODAL SCANNER QR -->
+    <div id="modal-scan" class="fixed inset-0 z-[60] bg-black hidden flex-col transition-opacity duration-300">
+        <div class="p-6 flex justify-between items-center text-white bg-gradient-to-b from-black/80 to-transparent absolute top-0 w-full z-10">
+            <span class="font-bold font-cyber tracking-widest">SCAN QR KELAS</span>
+            <button onclick="app.closeScanner()" class="p-2 bg-white/10 hover:bg-white/20 rounded-full transition-colors">
+                <i class="ph ph-x text-xl"></i>
+            </button>
+        </div>
+        <div id="reader" class="flex-1 bg-black flex items-center justify-center w-full h-full overflow-hidden"></div>
+        <div class="p-6 text-center text-white/50 text-xs absolute bottom-10 w-full z-10 bg-gradient-to-t from-black/80 to-transparent">
+            Arahkan kamera ke QR Code yang ditampilkan Guru Mapel
+        </div>
+    </div>
+
+    <!-- MODAL MANUAL INPUT -->
+    <div id="modal-manual" class="fixed inset-0 z-[60] bg-black/80 hidden items-center justify-center p-4 backdrop-blur-sm transition-opacity duration-300">
+        <div class="glass-panel w-full max-w-sm rounded-3xl p-6 relative overflow-hidden animate-fade-in shadow-2xl">
+            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-accent to-fuchsia-500"></div>
+            
+            <h3 class="font-bold text-lg text-slate-800 dark:text-white mb-6 flex items-center gap-2">
+                <i class="ph ph-keyboard text-accent"></i> Presensi Manual
+            </h3>
+            
+            <div class="space-y-5">
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2">Mata Pelajaran</label>
+                    <input type="text" id="manual-mapel" class="glow-input w-full p-4 rounded-xl text-sm font-bold font-mono focus:ring-2 focus:ring-accent outline-none uppercase placeholder-slate-400" placeholder="Contoh: MATEMATIKA">
+                </div>
+                
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2">Token Guru</label>
+                    <input type="text" id="manual-token" class="glow-input w-full p-4 rounded-xl text-center text-2xl font-mono font-bold tracking-[0.5em] uppercase outline-none focus:ring-2 focus:ring-accent placeholder-slate-400" placeholder="----" maxlength="4">
+                </div>
+            </div>
+
+            <div class="flex gap-3 mt-8">
+                <button onclick="document.getElementById('modal-manual').classList.add('hidden'); document.getElementById('modal-manual').classList.remove('flex');" class="flex-1 py-3 text-slate-500 dark:text-slate-400 font-bold hover:bg-slate-200 dark:hover:bg-slate-700/50 rounded-xl transition-colors text-sm">Batal</button>
+                <button onclick="app.submitManual()" class="flex-[2] py-3 bg-gradient-to-r from-accent to-fuchsia-600 text-white rounded-xl font-bold shadow-lg shadow-accent/30 hover:to-indigo-500 transition-all transform active:scale-95 text-sm tracking-wider uppercase">Verifikasi</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
+        import { getAuth, signInAnonymously, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
+        import { getFirestore, doc, getDoc, setDoc } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAwIwimlyrE4qQqYa2gA8Pfygd59USsveQ",
+            authDomain: "aplikasi-ulangan-01.firebaseapp.com",
+            projectId: "aplikasi-ulangan-01",
+            storageBucket: "aplikasi-ulangan-01.firebasestorage.app",
+            messagingSenderId: "409085062439",
+            appId: "1:409085062439:web:280589d1a3e12e7b980d02",
+        };
+
+        const appInit = initializeApp(firebaseConfig);
+        const db = getFirestore(appInit);
+        const auth = getAuth(appInit);
+
+        // --- THEME LOGIC ---
+        window.toggleTheme = () => {
+            document.documentElement.classList.toggle('dark');
+            localStorage.theme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+        };
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage)) || localStorage.theme === undefined) {
+            document.documentElement.classList.add('dark');
+        } else if (localStorage.theme === 'light') {
+            document.documentElement.classList.remove('dark');
+        }
+
+        class StudentApp {
+            constructor() {
+                this.nis = localStorage.getItem('student_nis');
+                this.data = null;
+                this.html5QrCode = null;
+                
+                onAuthStateChanged(auth, u => {
+                    if(!u) {
+                        signInAnonymously(auth).catch(e => {
+                            console.error(e);
+                            this.showLoading(false);
+                            alert("Koneksi gagal. Periksa jaringan Anda.");
+                        });
+                    } else {
+                        if(this.nis) {
+                            this.init();
+                        } else {
+                            this.showLoading(false); // <--- FIX: Pastikan loading screen disembunyikan untuk user baru
+                            this.showView('view-login');
+                        }
+                    }
+                });
+            }
+
+            formatNIS(input) {
+                let val = input.value.replace(/\D/g, '');
+                if (val.length > 4) val = val.substring(0, 4) + '.' + val.substring(4);
+                if (val.length > 7) val = val.substring(0, 7) + '.' + val.substring(7);
+                input.value = val;
+            }
+
+            showLoading(show) {
+                const el = document.getElementById('loading-screen');
+                if (show) el.classList.remove('hidden');
+                else el.classList.add('hidden');
+            }
+
+            showView(id) {
+                document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+                document.getElementById('main-app').classList.add('hidden');
+                
+                if (id === 'main-app') {
+                    document.getElementById('main-app').classList.remove('hidden');
+                    document.getElementById('main-app').classList.add('flex');
+                } else {
+                    document.getElementById(id).classList.add('active');
+                }
+            }
+
+            async login(e) {
+                e.preventDefault();
+                const val = document.getElementById('input-nis').value.trim();
+                if(!val) return;
+                
+                this.showLoading(true);
+                try {
+                    const snap = await getDoc(doc(db, 'siswa', val));
+                    if(snap.exists()) {
+                        localStorage.setItem('student_nis', val);
+                        this.nis = val;
+                        await this.init(); // Wait for init to finish before changing states
+                    } else { 
+                        alert("NIS tidak ditemukan di database!"); 
+                        this.showLoading(false);
+                    }
+                } catch(e) { 
+                    alert("Error koneksi: " + e.message); 
+                    this.showLoading(false);
+                }
+            }
+
+            async init() {
+                this.showLoading(true);
+                try {
+                    const snap = await getDoc(doc(db, 'siswa', this.nis));
+                    if (snap.exists()) {
+                        this.data = snap.data();
+                        
+                        document.getElementById('display-name').innerText = this.data.nama;
+                        document.getElementById('header-class').innerText = this.data.kelas || "Kelas -";
+                        document.getElementById('header-nis').innerText = this.nis;
+                        document.getElementById('profile-name').innerText = this.data.nama;
+                        document.getElementById('profile-nis').innerText = "NIS: " + this.nis;
+                        
+                        const init = this.data.nama.substring(0,1).toUpperCase();
+                        document.getElementById('header-avatar').innerText = init;
+                        document.getElementById('profile-avatar').innerText = init;
+
+                        this.showView('main-app');
+                        this.checkToday();
+                    } else {
+                        this.logout();
+                    }
+                } catch(e) {
+                    console.error(e);
+                }
+                this.showLoading(false);
+            }
+
+            async checkToday() {
+                const today = new Date().toISOString().split('T')[0];
+                const izinPath = `artifacts/presensi-sekolah-terintegrasi/public/data/izin_global/${today}_${this.nis}`;
+                
+                try {
+                    const izinSnap = await getDoc(doc(db, izinPath));
+                    if(izinSnap.exists()) {
+                        document.getElementById('home-status').innerText = "Izin Tercatat";
+                        document.getElementById('home-status').classList.remove('text-primary');
+                        document.getElementById('home-status').classList.add('text-warning');
+                        document.getElementById('status-banner').classList.replace('border-l-primary', 'border-l-warning');
+                        document.getElementById('home-desc').innerText = "Status Global: " + (izinSnap.data().tipe === 's' ? 'Sakit' : 'Izin');
+                    }
+                } catch(e) { console.error(e); }
+            }
+
+            openScanner() {
+                document.getElementById('modal-scan').classList.remove('hidden');
+                document.getElementById('modal-scan').classList.add('flex');
+                
+                // Gunakan config yang responsif untuk mobile
+                const config = { fps: 10, qrbox: { width: 250, height: 250 }, aspectRatio: 1.0 };
+                this.html5QrCode = new Html5Qrcode("reader");
+                this.html5QrCode.start({ facingMode: "environment" }, config, 
+                    (txt) => this.handleScan(txt), 
+                    (err) => {} // Abaikan error frame kosong
+                ).catch(err => {
+                    alert("Kamera tidak dapat diakses. Pastikan Anda memberi izin kamera pada browser.");
+                    this.closeScanner();
+                });
+            }
+            
+            closeScanner() {
+                if(this.html5QrCode) {
+                    this.html5QrCode.stop().then(() => {
+                        this.html5QrCode.clear();
+                    }).catch(err => console.log(err));
+                }
+                document.getElementById('modal-scan').classList.add('hidden');
+                document.getElementById('modal-scan').classList.remove('flex');
+            }
+            
+            async handleScan(txt) {
+                this.closeScanner();
+                try {
+                    const d = JSON.parse(txt);
+                    if(d.c !== this.data.kelas) return alert("GAGAL: Ini bukan QR Code untuk kelas Anda!");
+                    this.processAttendance(d.m, d.t, d.d, 'qr');
+                } catch(e) { 
+                    alert("Format QR Code tidak valid atau bukan dari aplikasi guru yang sah."); 
+                }
+            }
+
+            openManualInput() { 
+                document.getElementById('modal-manual').classList.remove('hidden'); 
+                document.getElementById('modal-manual').classList.add('flex'); 
+                document.getElementById('manual-mapel').focus();
+            }
+            
+            async submitManual() {
+                const token = document.getElementById('manual-token').value.toUpperCase().trim();
+                const mapel = document.getElementById('manual-mapel').value.trim();
+                
+                if(!mapel) return alert("Masukkan Nama Mata Pelajaran!");
+                if(!token) return alert("Masukkan Token!");
+                
+                const today = new Date().toISOString().split('T')[0];
+                await this.processAttendance(mapel, token, today, 'manual');
+                
+                document.getElementById('modal-manual').classList.add('hidden');
+                document.getElementById('modal-manual').classList.remove('flex');
+                document.getElementById('manual-token').value = '';
+                document.getElementById('manual-mapel').value = '';
+            }
+
+            async processAttendance(mapel, token, date, method) {
+                this.showLoading(true);
+                const mapelTitle = mapel.replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
+                const docId = `${this.data.kelas}_${mapelTitle}_${date}`;
+                
+                try {
+                    const ref = doc(db, 'presensi', docId);
+                    const update = {};
+                    update[this.nis] = { status: 'h', time: new Date().toLocaleTimeString('id-ID'), method: method };
+                    
+                    await setDoc(ref, { ...update, mapel: mapelTitle }, { merge: true });
+                    alert(`✅ BERHASIL ABSEN\nMata Pelajaran: ${mapelTitle}`);
+                } catch(e) { 
+                    alert("Gagal memproses absen: " + e.message); 
+                }
+                this.showLoading(false);
+            }
+
+            switchPage(id) {
+                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+                document.getElementById('page-'+id).classList.add('active');
+                
+                document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+                const navMap = { 'home': 0, 'profile': 1 };
+                if(navMap[id] !== undefined) document.querySelectorAll('.nav-item')[navMap[id]].classList.add('active');
+            }
+
+            logout() {
+                if(confirm("Apakah Anda yakin ingin keluar dari aplikasi Presensi Kelas?")) {
+                    localStorage.removeItem('student_nis');
+                    location.reload();
+                }
+            }
+        }
+        window.app = new StudentApp();
+    </script>
+</body>
+</html>

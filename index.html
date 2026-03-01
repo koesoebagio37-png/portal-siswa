@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="id" class="antialiased">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Dashboard Siswa - Comfort & Glow</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class', 
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                        cyber: ['Orbitron', 'sans-serif'],
+                    },
+                    colors: {
+                        'deep': '#0f172a', 'surface': '#1e293b', 'primary': '#38bdf8',
+                        'accent': '#818cf8', 'success': '#34d399', 'warning': '#fbbf24', 'danger': '#f87171',
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.6s ease-out',
+                        'float': 'float 6s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        fadeIn: { '0%': { opacity: '0', transform: 'translateY(10px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } },
+                        float: { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-10px)' } }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400;700&family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(129, 140, 248, 0.15) 0px, transparent 50%);
+            background-attachment: fixed;
+            -webkit-tap-highlight-color: transparent;
+        }
+        html.dark body {
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.1) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(129, 140, 248, 0.1) 0px, transparent 50%);
+        }
+
+        /* PREMIUM GLASS STYLE (DUAL MODE) */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+        }
+        html.dark .glass-panel {
+            background: rgba(30, 41, 59, 0.70);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+        }
+
+        .glow-input {
+            background: rgba(255, 255, 255, 0.6);
+            border: 1px solid #cbd5e1;
+            color: #1e293b;
+            transition: all 0.3s ease;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .glow-input:focus {
+            border-color: #38bdf8;
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 0 25px rgba(56, 189, 248, 0.2);
+            outline: none;
+        }
+        html.dark .glow-input {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid #334155;
+            color: #ffffff;
+        }
+        html.dark .glow-input:focus {
+            border-color: #38bdf8;
+            background: rgba(15, 23, 42, 0.9);
+            box-shadow: 0 0 25px rgba(56, 189, 248, 0.15);
+        }
+
+        /* App Container for Mobile View on Desktop */
+        .app-container {
+            max-width: 480px;
+            margin: 0 auto;
+            min-height: 100vh;
+            position: relative;
+            padding-bottom: 90px;
+        }
+        
+        .page { display: none; animation: fadeIn 0.4s ease-out forwards; }
+        .page.active { display: block; }
+        
+        .nav-item { color: #64748b; transition: all 0.3s; }
+        html.dark .nav-item { color: #94a3b8; }
+        .nav-item.active { color: #38bdf8; text-shadow: 0 0 10px rgba(56, 189, 248, 0.5); }
+        .nav-item.active i { font-weight: bold; transform: scale(1.15) translateY(-2px); }
+        
+        .card-press { transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.15s; }
+        .card-press:active { transform: scale(0.96); box-shadow: none; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 dark:bg-[#0f172a] dark:text-[#f8fafc] transition-colors duration-500">
+
+    <!-- Ambient Background Animation -->
+    <div class="fixed inset-0 w-full h-full overflow-hidden pointer-events-none z-0">
+        <div class="absolute top-[-10%] left-[-10%] w-[400px] h-[400px] bg-primary/10 rounded-full blur-[100px] animate-float"></div>
+        <div class="absolute bottom-[-10%] right-[-10%] w-[400px] h-[400px] bg-accent/10 rounded-full blur-[100px] animate-float" style="animation-delay: 3s"></div>
+    </div>
+
+    <div class="app-container relative z-10">
+        
+        <!-- LOADING OVERLAY -->
+        <div id="loading-screen" class="fixed inset-0 bg-slate-50/90 dark:bg-deep/90 z-[100] flex flex-col items-center justify-center backdrop-blur-md hidden">
+            <div class="w-20 h-20 border-4 border-slate-300 dark:border-slate-700 border-t-primary rounded-full animate-spin mb-6"></div>
+            <p class="text-sm text-primary font-mono font-bold tracking-[0.3em] uppercase animate-pulse">Menyiapkan Sistem...</p>
+        </div>
+
+        <!-- VIEW: LOGIN -->
+        <div id="view-login" class="flex flex-col items-center justify-center min-h-screen p-6 hidden">
+            <div class="glass-panel rounded-3xl p-8 w-full text-center relative overflow-hidden animate-fade-in shadow-2xl">
+                <!-- Top Accent Line -->
+                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary via-accent to-primary"></div>
+                
+                <!-- Logo Sekolah -->
+                <img src="Logo.png" alt="Logo Sekolah" class="h-24 mx-auto mb-6 object-contain drop-shadow-xl" onerror="this.src='https://ui-avatars.com/api/?name=SMA&background=0ea5e9&color=fff&size=100'">
+                
+                <h1 class="text-3xl font-bold font-cyber tracking-tight text-slate-900 dark:text-white mb-2">PORTAL SISWA</h1>
+                <p class="text-slate-500 dark:text-slate-400 text-xs tracking-widest uppercase mb-10">Comfort & Glow Education</p>
+
+                <form onsubmit="app.login(event)" class="w-full space-y-6">
+                    <input type="tel" id="input-nis" oninput="app.formatNIS(this)" 
+                        class="glow-input w-full p-5 rounded-2xl text-center text-xl font-bold tracking-[0.2em] placeholder-slate-400 dark:placeholder-slate-500" 
+                        placeholder="NIS SISWA">
+                    
+                    <button type="submit" id="btn-login" class="w-full py-4 rounded-2xl bg-gradient-to-r from-primary to-accent hover:to-indigo-500 text-white font-bold shadow-lg shadow-primary/30 transition-all transform active:scale-95 tracking-wider uppercase text-sm">
+                        Masuk Sistem
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- VIEW: MAIN DASHBOARD -->
+        <div id="view-main" class="hidden">
+            
+            <!-- Global Header with Logo -->
+            <header class="pt-10 pb-6 px-6 glass-panel sticky top-0 z-40 rounded-b-3xl shadow-[0_10px_30px_-10px_rgba(0,0,0,0.1)] dark:shadow-[0_10px_30px_-10px_rgba(0,0,0,0.5)]">
+                
+                <!-- Theme Toggle (Top Right) -->
+                <button onclick="window.toggleTheme()" class="absolute top-6 right-6 p-2 bg-slate-200/50 dark:bg-slate-800/50 rounded-xl text-slate-600 dark:text-slate-300 hover:text-primary transition-all border border-white/20">
+                    <i class="ph ph-moon dark:hidden text-lg"></i>
+                    <i class="ph ph-sun hidden dark:block text-lg"></i>
+                </button>
+
+                <div class="flex flex-col items-center text-center mt-2">
+                    <img src="Logo.png" alt="Logo Sekolah" class="h-16 mb-4 object-contain drop-shadow-md" onerror="this.style.display='none'">
+                    <h2 class="text-xl font-bold text-slate-900 dark:text-white leading-tight tracking-tight" id="header-name">Nama Siswa</h2>
+                    <div class="flex items-center gap-2 mt-2">
+                        <span class="px-3 py-1 bg-primary/10 text-primary text-[10px] font-bold rounded-full border border-primary/20 uppercase tracking-widest" id="header-class">Kelas</span>
+                        <span class="px-3 py-1 bg-slate-200/50 dark:bg-slate-800/50 text-slate-600 dark:text-slate-400 text-[10px] font-mono rounded-full border border-white/10" id="header-nis">NIS</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- TAB 1: BERANDA (HOME) -->
+            <div id="page-home" class="page active p-6 space-y-8">
+                
+                <!-- Section: Presensi -->
+                <div>
+                    <h3 class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+                        <i class="ph ph-calendar-check text-primary text-lg"></i> Modul Kehadiran
+                    </h3>
+                    
+                    <!-- Presensi Sejajar (Grid 2 Kolom) -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <!-- Card Presensi Piket -->
+                        <a href="presensi-global-siswa.html" class="card-press block glass-panel p-5 rounded-3xl border border-white/20 hover:border-primary/50 relative overflow-hidden group">
+                            <div class="absolute -right-4 -top-4 w-20 h-20 bg-primary/10 rounded-full blur-xl group-hover:bg-primary/20 transition-all"></div>
+                            <div class="w-12 h-12 bg-primary/10 text-primary rounded-2xl flex items-center justify-center text-2xl mb-4 border border-primary/20 shadow-inner">
+                                <i class="ph ph-buildings"></i>
+                            </div>
+                            <h4 class="font-bold text-sm text-slate-800 dark:text-white leading-tight mb-1">Presensi<br>Piket</h4>
+                            <p class="text-[10px] text-slate-500 dark:text-slate-400">Gerbang Sekolah</p>
+                        </a>
+
+                        <!-- Card Presensi Kelas -->
+                        <a href="aplikasi-presensi-siswa.html" class="card-press block glass-panel p-5 rounded-3xl border border-white/20 hover:border-success/50 relative overflow-hidden group">
+                            <div class="absolute -right-4 -top-4 w-20 h-20 bg-success/10 rounded-full blur-xl group-hover:bg-success/20 transition-all"></div>
+                            <div class="w-12 h-12 bg-success/10 text-success rounded-2xl flex items-center justify-center text-2xl mb-4 border border-success/20 shadow-inner">
+                                <i class="ph ph-chalkboard-teacher"></i>
+                            </div>
+                            <h4 class="font-bold text-sm text-slate-800 dark:text-white leading-tight mb-1">Presensi<br>Kelas</h4>
+                            <p class="text-[10px] text-slate-500 dark:text-slate-400">Guru Mapel</p>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Section: Ujian -->
+                <div>
+                    <h3 class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+                        <i class="ph ph-exam text-accent text-lg"></i> Evaluasi Akademik
+                    </h3>
+                    
+                    <!-- Portal Ujian (Lebar Penuh) -->
+                    <a href="portal-ujian-siswa.html" class="card-press block bg-slate-900 p-6 rounded-3xl shadow-2xl relative overflow-hidden border border-slate-700 group">
+                        <!-- Decorative Elements -->
+                        <div class="absolute -right-10 -top-10 w-40 h-40 bg-accent/30 rounded-full blur-3xl group-hover:bg-accent/40 transition-colors duration-500"></div>
+                        <div class="absolute -left-10 -bottom-10 w-40 h-40 bg-primary/20 rounded-full blur-3xl"></div>
+                        
+                        <div class="flex items-center gap-5 relative z-10">
+                            <div class="w-16 h-16 bg-gradient-to-br from-accent to-fuchsia-600 rounded-2xl flex items-center justify-center text-white text-3xl shadow-lg border border-white/20">
+                                <i class="ph ph-laptop"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-xl text-white mb-1 tracking-wide font-cyber">PORTAL UJIAN</h4>
+                                <p class="text-xs text-slate-400">Akses Ulangan & PAS/PTS</p>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6 pt-5 border-t border-slate-700/50 flex justify-between items-center relative z-10">
+                            <span class="flex items-center gap-2 text-[10px] text-accent font-mono uppercase tracking-widest px-3 py-1.5 bg-accent/10 border border-accent/20 rounded-lg font-bold">
+                                <span class="w-2 h-2 rounded-full bg-accent animate-pulse"></span> Secure Mode
+                            </span>
+                            <div class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white backdrop-blur-sm group-hover:bg-primary transition-colors">
+                                <i class="ph ph-arrow-right"></i>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+            </div>
+
+            <!-- TAB 2: PROFIL & PENGATURAN (BACK PAGE) -->
+            <div id="page-profile" class="page p-6 space-y-6">
+                
+                <h3 class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+                    <i class="ph ph-gear text-slate-400 text-lg"></i> Pengaturan Data
+                </h3>
+
+                <div class="space-y-4">
+                    <!-- Upload Foto -->
+                    <a href="portal-upload-foto.html" class="card-press flex items-center justify-between p-5 glass-panel rounded-3xl hover:border-primary/50 transition-colors">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-primary/10 border border-primary/20 text-primary rounded-2xl flex items-center justify-center text-2xl shadow-inner">
+                                <i class="ph ph-camera"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm text-slate-800 dark:text-white">Upload Foto Profil</h4>
+                                <p class="text-[10px] text-slate-500 dark:text-slate-400">Perbarui foto database</p>
+                            </div>
+                        </div>
+                        <i class="ph ph-caret-right text-slate-400"></i>
+                    </a>
+
+                    <!-- Data WA Ortu -->
+                    <a href="portal-data-wa-ortu.html" class="card-press flex items-center justify-between p-5 glass-panel rounded-3xl hover:border-success/50 transition-colors">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-success/10 border border-success/20 text-success rounded-2xl flex items-center justify-center text-2xl shadow-inner">
+                                <i class="ph ph-whatsapp-logo"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm text-slate-800 dark:text-white">Update Kontak Wali</h4>
+                                <p class="text-[10px] text-slate-500 dark:text-slate-400">Nomor WA Orang Tua</p>
+                            </div>
+                        </div>
+                        <i class="ph ph-caret-right text-slate-400"></i>
+                    </a>
+                </div>
+
+                <div class="pt-8 mt-8 border-t border-slate-200 dark:border-white/10">
+                    <button onclick="app.logout()" class="w-full flex items-center justify-center gap-2 py-4 bg-danger/10 border border-danger/20 text-danger font-bold rounded-2xl hover:bg-danger hover:text-white transition-all transform active:scale-95 shadow-sm uppercase tracking-wider text-sm">
+                        <i class="ph ph-sign-out text-xl"></i> Keluar Akun
+                    </button>
+                </div>
+                
+                <div class="text-center text-[10px] text-slate-400 dark:text-slate-500 font-mono mt-8 uppercase tracking-widest">
+                    Secure Student Hub v2.0<br>&copy; Comfort & Glow
+                </div>
+            </div>
+
+            <!-- BOTTOM NAVIGATION -->
+            <nav class="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-[480px] glass-panel border-t border-white/20 flex justify-around py-3 pb-8 z-50 rounded-t-3xl">
+                <button onclick="app.switchTab('home')" class="nav-item active flex flex-col items-center gap-1.5 w-20 py-2">
+                    <i class="ph ph-house text-[26px]"></i>
+                    <span class="text-[10px] font-bold uppercase tracking-widest">Beranda</span>
+                </button>
+                <button onclick="app.switchTab('profile')" class="nav-item flex flex-col items-center gap-1.5 w-20 py-2">
+                    <i class="ph ph-user text-[26px]"></i>
+                    <span class="text-[10px] font-bold uppercase tracking-widest">Profil</span>
+                </button>
+            </nav>
+
+        </div>
+    </div>
+
+    <!-- FIREBASE & LOGIC -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
+        import { getAuth, signInAnonymously } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
+        import { getFirestore, doc, getDoc } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAwIwimlyrE4qQqYa2gA8Pfygd59USsveQ",
+            authDomain: "aplikasi-ulangan-01.firebaseapp.com",
+            projectId: "aplikasi-ulangan-01",
+            storageBucket: "aplikasi-ulangan-01.firebasestorage.app",
+            messagingSenderId: "409085062439",
+            appId: "1:409085062439:web:280589d1a3e12e7b980d02",
+        };
+
+        const firebaseApp = initializeApp(firebaseConfig);
+        const auth = getAuth(firebaseApp);
+        const db = getFirestore(firebaseApp);
+
+        // --- THEME TOGGLE LOGIC ---
+        window.toggleTheme = () => {
+            document.documentElement.classList.toggle('dark');
+            localStorage.theme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+        };
+
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage)) || localStorage.theme === undefined) {
+            document.documentElement.classList.add('dark');
+        } else if (localStorage.theme === 'light') {
+            document.documentElement.classList.remove('dark');
+        }
+
+        class DashboardApp {
+            constructor() {
+                this.nis = localStorage.getItem('student_nis') || '';
+                this.studentData = null;
+                this.init();
+            }
+
+            async init() {
+                await signInAnonymously(auth).catch(e => console.error("Auth error", e));
+                
+                if (this.nis) {
+                    this.loadStudentData();
+                } else {
+                    document.getElementById('view-login').classList.remove('hidden');
+                    document.getElementById('view-login').classList.add('flex');
+                }
+            }
+
+            formatNIS(input) {
+                let val = input.value.replace(/\D/g, '');
+                if (val.length > 4) val = val.substring(0, 4) + '.' + val.substring(4);
+                if (val.length > 7) val = val.substring(0, 7) + '.' + val.substring(7);
+                input.value = val;
+            }
+
+            showLoading(show) {
+                const el = document.getElementById('loading-screen');
+                if (show) el.classList.remove('hidden');
+                else el.classList.add('hidden');
+            }
+
+            async login(e) {
+                e.preventDefault();
+                const nisInput = document.getElementById('input-nis').value.trim();
+                if (!nisInput) return;
+
+                this.showLoading(true);
+                document.getElementById('btn-login').disabled = true;
+
+                try {
+                    const snap = await getDoc(doc(db, 'siswa', nisInput));
+                    if (snap.exists()) {
+                        localStorage.setItem('student_nis', nisInput);
+                        this.nis = nisInput;
+                        await this.loadStudentData();
+                    } else {
+                        alert("NIS tidak ditemukan di database sekolah.");
+                    }
+                } catch (error) {
+                    alert("Koneksi bermasalah: " + error.message);
+                } finally {
+                    this.showLoading(false);
+                    document.getElementById('btn-login').disabled = false;
+                }
+            }
+
+            async loadStudentData() {
+                this.showLoading(true);
+                try {
+                    const snap = await getDoc(doc(db, 'siswa', this.nis));
+                    if (snap.exists()) {
+                        this.studentData = snap.data();
+                        
+                        document.getElementById('header-name').textContent = this.studentData.nama;
+                        document.getElementById('header-class').textContent = this.studentData.kelas || "Kelas -";
+                        document.getElementById('header-nis').textContent = this.nis;
+
+                        document.getElementById('view-login').classList.add('hidden');
+                        document.getElementById('view-login').classList.remove('flex');
+                        document.getElementById('view-main').classList.remove('hidden');
+                    } else {
+                        this.logout(); 
+                    }
+                } catch (e) {
+                    console.error(e);
+                } finally {
+                    this.showLoading(false);
+                }
+            }
+
+            switchTab(tabId) {
+                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+                document.getElementById('page-' + tabId).classList.add('active');
+                
+                document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+                const navIndex = tabId === 'home' ? 0 : 1;
+                document.querySelectorAll('.nav-item')[navIndex].classList.add('active');
+            }
+
+            logout() {
+                if(confirm("Apakah Anda yakin ingin keluar dari sistem?")) {
+                    localStorage.removeItem('student_nis');
+                    location.reload();
+                }
+            }
+        }
+
+        window.app = new DashboardApp();
+    </script>
+</body>
+</html>
