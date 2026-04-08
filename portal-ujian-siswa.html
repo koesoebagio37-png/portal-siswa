@@ -190,9 +190,9 @@
             <h1 class="text-3xl font-bold text-white mb-2 tracking-tight">Portal Ujian</h1>
             <p class="text-slate-400 text-sm mb-10">Masukkan NIS untuk memulai sesi aman.</p>
             <div class="space-y-6">
-                <!-- FITUR AUTO-FORMAT TITIK DIHILANGKAN AGAR BEBAS MENGETIK -->
-                <input type="tel" id="input-nis" class="glow-input w-full p-5 rounded-2xl text-center text-xl font-bold uppercase tracking-widest placeholder-slate-600" placeholder="NOMOR SISWA">
-                <p class="text-[10px] text-slate-500 dark:text-slate-400 mt-2 text-center">*Ketik NIS Anda dengan atau tanpa tanda titik.</p>
+                <!-- FITUR AUTO-FORMAT TITIK DIKEMBALIKAN -->
+                <input type="tel" id="input-nis" oninput="window.formatNIS(this)" maxlength="11" class="glow-input w-full p-5 rounded-2xl text-center text-xl font-bold uppercase tracking-widest placeholder-slate-600" placeholder="NOMOR SISWA">
+                <p class="text-[10px] text-slate-500 dark:text-slate-400 mt-2 text-center">*Ketik angka saja, titik otomatis muncul.</p>
                 <button onclick="checkNIS()" class="w-full py-4 rounded-2xl bg-gradient-to-r from-primary to-accent hover:to-indigo-500 text-white font-bold shadow-lg shadow-primary/25 transition-all transform hover:scale-[1.02] active:scale-95 tracking-wide">
                     MASUK SISTEM
                 </button>
@@ -503,6 +503,26 @@
             document.documentElement.classList.remove('dark');
         }
 
+        // --- FORMAT NIS OTOMATIS KEMBALI ---
+        window.formatNIS = (input) => {
+            let val = input.value.replace(/\D/g, '');
+            if (val.length > 4) val = val.substring(0, 4) + '.' + val.substring(4);
+            if (val.length > 7) val = val.substring(0, 7) + '.' + val.substring(7);
+            input.value = val;
+        };
+
+        // --- SCREEN SWITCHING LOGIC FIXED ---
+        window.switchScreen = (id) => {
+            // Sembunyikan semua screen, termasuk screen-dashboard yang tadinya tertinggal
+            ['screen-login', 'screen-dashboard', 'screen-token', 'screen-exam', 'screen-result'].forEach(s => {
+                const el = document.getElementById(s);
+                if (el) el.classList.add('hidden');
+            });
+            // Tampilkan screen target
+            const target = document.getElementById(id);
+            if (target) target.classList.remove('hidden');
+        };
+
         // --- TITLE CASE HELPER ---
         function toTitleCase(str) {
             return str.replace(/\w\S*/g, function(txt){
@@ -678,7 +698,7 @@
             
             showLoading(true, "MEMUAT DATA SISWA...");
             try {
-                // 1. Coba langsung dengan input mentah
+                // 1. Coba langsung dengan input mentah (Bisa dengan titik)
                 let snap = await getDoc(doc(db, 'siswa', rawNis));
                 
                 // 2. Jika tidak ketemu, coba hapus semua karakter selain angka/huruf
@@ -1356,8 +1376,12 @@
         }
 
         function switchScreen(id) {
-            ['screen-login', 'screen-token', 'screen-exam', 'screen-result'].forEach(s => document.getElementById(s).classList.add('hidden'));
-            document.getElementById(id).classList.remove('hidden');
+            ['screen-login', 'screen-dashboard', 'screen-token', 'screen-exam', 'screen-result'].forEach(s => {
+                const el = document.getElementById(s);
+                if (el) el.classList.add('hidden');
+            });
+            const target = document.getElementById(id);
+            if (target) target.classList.remove('hidden');
         }
 		function showLoading(show, text="MEMUAT...") { 
             const el = document.getElementById('loading-overlay');
