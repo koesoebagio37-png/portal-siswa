@@ -8,7 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
-			darkMode: 'class', // <--- TAMBAHKAN BARIS INI
+			darkMode: 'class',
             theme: {
                 extend: {
                     fontFamily: {
@@ -453,7 +453,6 @@
         </div>
     </div>
 
-    <!-- FIX: Menghapus sintaks markdown dari import statements -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -470,6 +469,7 @@
         let db, auth, userId, studentData, examData, questions = [], answers = [], currentIndex = 0, timerInterval, cheatCount = 0, examEndTime;
         let isSubmitting = false;
         window.isUploading = false;
+        let uploadTimeout;
         let lastCheatTime = 0; // Debounce Timer
         let currentFontSize = 100; // Persentase Zoom Font
         
@@ -477,6 +477,20 @@
         let examListener = null;
         let statusListener = null; // NEW: Listener status real-time
         let heartbeatInterval = null; // NEW: Interval detak jantung aman
+
+        // --- SISTEM UPLOAD AMAN (BARU) ---
+        window.setUploading = (status) => {
+            if (status) {
+                window.isUploading = true;
+                clearTimeout(uploadTimeout);
+            } else {
+                clearTimeout(uploadTimeout);
+                // Jeda 3 detik untuk menyerap event kembalinya browser lambat
+                uploadTimeout = setTimeout(() => {
+                    window.isUploading = false;
+                }, 3000); 
+            }
+        };
 
 		// --- THEME TOGGLE LOGIC ---
         window.toggleTheme = () => {
@@ -561,9 +575,10 @@
 
         // Detector 1: Tab Switch
         document.addEventListener("visibilitychange", () => {
-            if (window.isUploading || isSubmitting || document.getElementById('screen-exam').classList.contains('hidden')) return;
+            if (isSubmitting || document.getElementById('screen-exam').classList.contains('hidden')) return;
             
             if (document.hidden) {
+                if (window.isUploading) return; // Memaafkan jika sedang buka kamera
                 updateCheatCount();
             } else {
                 // FIX: Jangan tampilkan warning lagi jika hanya kembali (kecuali sudah harus lock)
@@ -576,7 +591,7 @@
 
         // Detector 2: Exit Fullscreen (iOS FIX ADDED)
         const handleFullscreenChange = () => {
-            if (isSubmitting || window.isUploading || document.getElementById('screen-exam').classList.contains('hidden')) return;
+            if (isSubmitting || document.getElementById('screen-exam').classList.contains('hidden')) return;
 
             const blocker = document.getElementById('fullscreen-blocker');
             // Cek apakah browser mendukung fullscreen (Fix untuk iPhone yang biasanya false)
@@ -585,12 +600,17 @@
             const isFull = document.fullscreenElement || document.webkitFullscreenElement;
 
             if (isSupported && !isFull) {
-                updateCheatCount();
-                const limit = getCheatLimit();
-                if (cheatCount <= limit) {
+                if (window.isUploading) {
+                    // Memaafkan karena buka kamera, TAPI tetap tampilkan blocker agar siswa kembali ke mode fullscreen
                     blocker.style.display = 'flex';
                 } else {
-                    blocker.style.display = 'none';
+                    updateCheatCount();
+                    const limit = getCheatLimit();
+                    if (cheatCount <= limit) {
+                        blocker.style.display = 'flex';
+                    } else {
+                        blocker.style.display = 'none';
+                    }
                 }
             } else {
                 blocker.style.display = 'none';
@@ -600,7 +620,9 @@
         document.addEventListener("fullscreenchange", handleFullscreenChange);
         document.addEventListener("webkitfullscreenchange", handleFullscreenChange);
 
-        window.onfocus = () => { setTimeout(() => window.isUploading = false, 1000); };
+        window.onfocus = () => { 
+            if (window.isUploading) window.setUploading(false); 
+        };
         
         window.dismissWarning = () => {
             document.getElementById('warning-modal').classList.add('hidden');
@@ -726,7 +748,7 @@
         }
 
         window.startExam = async () => {
-            const code = document.getElementById('input-kode').value.trim().toUpperCase();
+            const code = document.getElementById('input-token').value.trim().toUpperCase();
             if(!code) return alert('Kode Salah!');
             
             try { 
@@ -1019,7 +1041,8 @@
                     const camDiv = document.createElement('div');
                     camDiv.className = "mt-6 pt-6 border-t border-white/10";
                     const uid = `cam-${idx}`;
-                    camDiv.innerHTML = `<label for="${uid}" class="cursor-pointer px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 rounded-xl text-white text-sm font-bold flex items-center gap-2 w-max transition-all shadow-lg" onclick="window.isUploading=true"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path></svg> Foto Jawaban</label><input type="file" id="${uid}" accept="image/*" class="hidden" capture="environment">
+                    // MENGGUNAKAN setUploading(true)
+                    camDiv.innerHTML = `<label for="${uid}" class="cursor-pointer px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 rounded-xl text-white text-sm font-bold flex items-center gap-2 w-max transition-all shadow-lg" onclick="window.setUploading(true)"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path></svg> Foto Jawaban</label><input type="file" id="${uid}" accept="image/*" class="hidden" capture="environment">
                     <div id="preview-${idx}" class="${ans.image ? 'mt-4' : 'mt-4 hidden'}">${ans.image ? `<div class="relative inline-block group"><img src="${ans.image}" class="h-40 rounded-xl border border-white/20 shadow-lg"><button onclick="delImg(${idx})" class="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1.5 shadow-md"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button></div>` : ''}</div>`;
                     containerO.appendChild(camDiv);
                     setTimeout(() => {
@@ -1031,8 +1054,8 @@
                                 saveImg(idx, comp);
                                 document.getElementById(`preview-${idx}`).innerHTML = `<div class="relative inline-block group"><img src="${comp}" class="h-40 rounded-xl border border-white/20 shadow-lg"><button onclick="delImg(${idx})" class="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1.5 shadow-md"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button></div>`;
                                 document.getElementById(`preview-${idx}`).classList.remove('hidden');
-                                window.isUploading = false;
-                            } else window.isUploading = false;
+                            }
+                            window.setUploading(false); // Matikan mode upload dengan aman
                         };
                     }, 100);
                 }
