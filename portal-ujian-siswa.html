@@ -314,7 +314,7 @@
             </div>
             <div class="flex items-center gap-4">
 				<!-- Theme Toggle Button -->
-                <button onclick="window.toggleTheme()" class="hidden md:flex p-2 bg-slate-100 dark:bg-slate-800/50 rounded-lg text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-white border border-slate-200 dark:border-white/5 transition-all mr-1" title="Mode Layar">
+                <button onclick="window.toggleTheme()" class="flex p-2 bg-slate-100 dark:bg-slate-800/50 rounded-lg text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-white border border-slate-200 dark:border-white/5 transition-all mr-1" title="Mode Layar">
                     <svg class="w-5 h-5 dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
                     <svg class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
                 </button>
@@ -589,54 +589,71 @@
             }
         }
 
-        // Detector 1: Tab Switch
+        // --- SUPER SECURITY SYSTEM (ANTI-CHEAT) ---
+        
+        function triggerWarning(reasonTitle, reasonText) {
+            updateCheatCount();
+            const limit = getCheatLimit();
+            if (cheatCount <= limit) {
+                // Ubah teks modal sesuai pelanggaran secara dinamis
+                document.querySelector('#warning-modal h2').innerText = reasonTitle;
+                document.querySelector('#warning-modal p').innerText = reasonText;
+                
+                // Pastikan fullscreen blocker sembunyi agar tidak tumpang tindih
+                document.getElementById('fullscreen-blocker').style.display = 'none';
+            }
+        }
+
+        // Detector 1: Tab Switch (Ganti Tab / Minimize)
         document.addEventListener("visibilitychange", () => {
-            if (isSubmitting || document.getElementById('screen-exam').classList.contains('hidden')) return;
-            
+            if (window.isUploading || isSubmitting || document.getElementById('screen-exam').classList.contains('hidden')) return;
             if (document.hidden) {
-                if (window.isUploading) return; // Memaafkan jika sedang buka kamera
-                updateCheatCount();
-            } else {
-                const limit = getCheatLimit();
-                if (cheatCount > limit) {
-                    checkSecurityStatus(); // Hanya panggil untuk lock
-                }
+                triggerWarning("GANTI TAB / MINIMIZE!", "Anda terdeteksi meninggalkan halaman ujian.");
             }
         });
 
-        // Detector 2: Exit Fullscreen (iOS FIX ADDED)
-        const handleFullscreenChange = () => {
-            if (isSubmitting || document.getElementById('screen-exam').classList.contains('hidden')) return;
+        // Detector 2: Kehilangan Fokus (Anti-Floating Window / PIP)
+        window.addEventListener("blur", () => {
+            if (window.isUploading || isSubmitting || document.getElementById('screen-exam').classList.contains('hidden')) return;
+            triggerWarning("FOKUS HILANG!", "Anda terdeteksi menyentuh aplikasi lain (Kalkulator Melayang/WhatsApp/Notifikasi).");
+        });
 
-            const blocker = document.getElementById('fullscreen-blocker');
-            // Cek apakah browser mendukung fullscreen
+        // Detector 3 & 4: Exit Fullscreen & Resize (Anti-Split Screen & Gestur Navigasi)
+        const handleFullscreenChange = () => {
+            if (isSubmitting || window.isUploading || document.getElementById('screen-exam').classList.contains('hidden')) return;
+
             const isSupported = document.fullscreenEnabled || document.webkitFullscreenEnabled;
-            // Cek apakah sedang fullscreen
             const isFull = document.fullscreenElement || document.webkitFullscreenElement;
 
             if (isSupported && !isFull) {
-                if (window.isUploading) {
-                    // Memaafkan karena buka kamera, TAPI tetap tampilkan blocker agar siswa kembali ke mode fullscreen
+                updateCheatCount();
+                const limit = getCheatLimit();
+                if (cheatCount <= limit) {
+                    // Sembunyikan warning modal biasa, gunakan blocker khusus layar penuh
+                    document.getElementById('warning-modal').classList.add('hidden');
+                    document.getElementById('warning-modal').classList.remove('flex');
+                    
+                    const blocker = document.getElementById('fullscreen-blocker');
                     blocker.style.display = 'flex';
-                } else {
-                    updateCheatCount();
-                    const limit = getCheatLimit();
-                    if (cheatCount <= limit) {
-                        blocker.style.display = 'flex';
-                    } else {
-                        blocker.style.display = 'none';
-                    }
+                    document.querySelector('#fullscreen-blocker h2').innerText = "LAYAR PENUH DIPERLUKAN";
+                    document.querySelector('#fullscreen-blocker p').innerText = "Anda terdeteksi melakukan Split-Screen atau mengusap menu navigasi.";
                 }
             } else {
-                blocker.style.display = 'none';
+                document.getElementById('fullscreen-blocker').style.display = 'none';
             }
         };
+
+        window.addEventListener("resize", () => {
+            if (window.isUploading || isSubmitting || document.getElementById('screen-exam').classList.contains('hidden')) return;
+            if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+                handleFullscreenChange(); 
+            }
+        });
+
         document.addEventListener("fullscreenchange", handleFullscreenChange);
         document.addEventListener("webkitfullscreenchange", handleFullscreenChange);
 
-        window.onfocus = () => { 
-            if (window.isUploading) window.setUploading(false); 
-        };
+        window.onfocus = () => { setTimeout(() => window.isUploading = false, 1000); };
         
         window.dismissWarning = () => {
             document.getElementById('warning-modal').classList.add('hidden');
@@ -646,6 +663,7 @@
 
         window.requestFullScreenAgain = () => {
             document.documentElement.requestFullscreen().catch(e=>{});
+            document.getElementById('fullscreen-blocker').style.display = 'none'; // Sembunyikan manual setelah diklik
         };
 
         // Unlock Logic
