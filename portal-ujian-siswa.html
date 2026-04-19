@@ -8,7 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
-			darkMode: 'class',
+            darkMode: 'class',
             theme: {
                 extend: {
                     fontFamily: {
@@ -125,14 +125,13 @@
         <div class="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-accent/5 rounded-full blur-[100px] animate-float" style="animation-delay: 3s"></div>
     </div>
 
-    <!-- MODALS & OVERLAYS -->
     <div id="warning-modal" class="fixed inset-0 z-[10000] bg-black/95 hidden flex-col items-center justify-center backdrop-blur-xl p-6 text-center animate-fade-in">
         <div class="glass-panel border border-red-500/50 rounded-3xl p-10 max-w-md w-full shadow-[0_0_100px_rgba(239,68,68,0.4)]">
             <div class="w-24 h-24 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-6 border border-red-500/20">
                 <span class="text-5xl">⚠️</span>
             </div>
-            <h2 class="text-3xl font-bold text-white mb-2 tracking-tight">PELANGGARAN!</h2>
-            <p class="text-slate-300 mb-6">Anda terdeteksi meninggalkan ujian. Ini tercatat sebagai pelanggaran.</p>
+            <h2 id="warning-title" class="text-3xl font-bold text-white mb-2 tracking-tight">PELANGGARAN!</h2>
+            <p id="warning-text" class="text-slate-300 text-sm mb-6">Anda terdeteksi meninggalkan ujian. Ini tercatat sebagai pelanggaran.</p>
             
             <div class="bg-red-500/10 p-4 rounded-xl border border-red-500/20 mb-8">
                 <p class="text-red-400 text-xs font-mono uppercase tracking-widest mb-1">TOTAL PELANGGARAN</p>
@@ -165,20 +164,11 @@
         </div>
     </div>
 
-    <div id="fullscreen-blocker" class="fixed inset-0 z-[9999] bg-black flex-col items-center justify-center hidden">
-        <div class="p-8 text-center glass-panel rounded-3xl border border-white/10">
-            <h2 class="text-2xl font-bold text-white mb-4">LAYAR PENUH DIPERLUKAN</h2>
-            <p class="text-slate-400 mb-8">Klik tombol di bawah untuk melanjutkan ujian.</p>
-            <button onclick="requestFullScreenAgain()" class="px-8 py-3 bg-gradient-to-r from-primary to-accent text-white font-bold rounded-xl shadow-lg">LANJUTKAN</button>
-        </div>
-    </div>
-
     <div id="loading-overlay" class="fixed inset-0 z-[80] bg-slate-900/90 flex flex-col items-center justify-center hidden backdrop-blur-md">
         <div class="w-20 h-20 border-4 border-slate-700 border-t-primary rounded-full animate-spin mb-6"></div>
         <div class="text-primary font-mono text-sm tracking-[0.3em] animate-pulse font-bold">SINKRONISASI DATA...</div>
     </div>
 
-    <!-- SCREENS -->
     <div id="screen-login" class="w-full max-w-md relative z-10 animate-fade-in p-4 mx-auto mt-20">
         <div class="glass-panel rounded-3xl p-10 text-center relative overflow-hidden">
             <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary via-accent to-primary opacity-50"></div>
@@ -187,11 +177,10 @@
                     <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
                 </div>
             </div>
-            <h1 class="text-3xl font-bold text-white mb-2 tracking-tight">Portal Ujian</h1>
-            <p class="text-slate-400 text-sm mb-10">Masukkan NIS untuk memulai sesi aman.</p>
+            <h1 class="text-3xl font-bold text-slate-800 dark:text-white mb-2 tracking-tight">Portal Ujian</h1>
+            <p class="text-slate-500 dark:text-slate-400 text-sm mb-10">Masukkan NIS untuk memulai sesi aman.</p>
             <div class="space-y-6">
-                <!-- FITUR AUTO-FORMAT TITIK DIKEMBALIKAN -->
-                <input type="tel" id="input-nis" oninput="window.formatNIS(this)" maxlength="11" class="glow-input w-full p-5 rounded-2xl text-center text-xl font-bold uppercase tracking-widest placeholder-slate-600" placeholder="NOMOR SISWA">
+                <input type="tel" id="input-nis" oninput="window.formatNIS(this)" maxlength="11" class="glow-input w-full p-5 rounded-2xl text-center text-xl font-bold uppercase tracking-widest placeholder-slate-400" placeholder="NOMOR SISWA">
                 <p class="text-[10px] text-slate-500 dark:text-slate-400 mt-2 text-center">*Ketik angka saja, titik otomatis muncul.</p>
                 <button onclick="checkNIS()" class="w-full py-4 rounded-2xl bg-gradient-to-r from-primary to-accent hover:to-indigo-500 text-white font-bold shadow-lg shadow-primary/25 transition-all transform hover:scale-[1.02] active:scale-95 tracking-wide">
                     MASUK SISTEM
@@ -199,56 +188,52 @@
             </div>
         </div>
     </div>
-	
-	<!-- SCREEN 2: DASHBOARD SISWA -->
+    
     <div id="screen-dashboard" class="hidden w-full max-w-4xl relative z-10 animate-fade-in p-4 mx-auto mt-10">
-        <!-- Header Profil -->
         <div class="glass-panel rounded-2xl p-6 mb-6 flex items-center justify-between">
             <div class="flex items-center gap-4">
                 <img id="dash-avatar" src="" class="w-12 h-12 rounded-full border-2 border-primary/50 object-cover bg-slate-800">
                 <div>
-                    <h2 id="dash-name" class="font-bold text-white text-lg">Nama Siswa</h2>
-                    <p class="text-xs text-slate-400"><span id="dash-kelas" class="text-primary font-bold">KELAS</span> • <span id="dash-nis">NIS</span></p>
+                    <h2 id="dash-name" class="font-bold text-slate-800 dark:text-white text-lg">Nama Siswa</h2>
+                    <p class="text-xs text-slate-500 dark:text-slate-400"><span id="dash-kelas" class="text-primary font-bold">KELAS</span> • <span id="dash-nis">NIS</span></p>
                 </div>
             </div>
-			<button onclick="window.toggleTheme()" class="p-2 bg-slate-100 dark:bg-slate-800 rounded-lg text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-white border border-transparent hover:border-primary/30 transition-all" title="Mode Tampilan">
-                    <svg class="w-5 h-5 dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
-                    <svg class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-            </button>
-            <button onclick="location.reload()" class="p-2 bg-slate-800 rounded-lg text-slate-400 hover:text-white border border-transparent hover:border-red-500/50 transition-all" title="Keluar">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
-            </button>
+            <div class="flex gap-2">
+                <button onclick="window.toggleTheme()" class="p-2 bg-slate-100 dark:bg-slate-800 rounded-lg text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-white border border-transparent hover:border-primary/30 transition-all" title="Mode Tampilan">
+                        <svg class="w-5 h-5 dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+                        <svg class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                </button>
+                <button onclick="location.reload()" class="p-2 bg-slate-800 rounded-lg text-slate-400 hover:text-white border border-transparent hover:border-red-500/50 transition-all" title="Keluar">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                </button>
+            </div>
         </div>
 
-        <!-- Tab Navigasi -->
-        <div class="flex gap-4 border-b border-slate-700 mb-6 px-2 overflow-x-auto">
+        <div class="flex gap-4 border-b border-slate-300 dark:border-slate-700 mb-6 px-2 overflow-x-auto">
             <button onclick="window.switchTab('sekolah')" id="tab-sekolah" class="px-4 py-2 text-sm font-bold text-primary border-b-2 border-primary transition-all whitespace-nowrap">
                 Ujian Sekolah (PAS/PAT/PSAJ)
             </button>
-            <button onclick="window.switchTab('harian')" id="tab-harian" class="px-4 py-2 text-sm font-bold text-slate-400 hover:text-white border-b-2 border-transparent transition-all whitespace-nowrap">
+            <button onclick="window.switchTab('harian')" id="tab-harian" class="px-4 py-2 text-sm font-bold text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white border-b-2 border-transparent transition-all whitespace-nowrap">
                 Ulangan Harian
             </button>
         </div>
 
-        <!-- Konten: Ujian Sekolah -->
         <div id="content-sekolah" class="animate-fade-in">
             <div id="list-ujian-sekolah" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <!-- Data akan diisi otomatis oleh JS -->
-                <div class="col-span-full text-center py-10 text-slate-500 bg-slate-800/30 rounded-xl border border-dashed border-slate-700">
+                <div class="col-span-full text-center py-10 text-slate-500 bg-slate-100 dark:bg-slate-800/30 rounded-xl border border-dashed border-slate-300 dark:border-slate-700">
                     Memuat jadwal ujian...
                 </div>
             </div>
         </div>
 
-        <!-- Konten: Ulangan Harian -->
         <div id="content-harian" class="hidden animate-fade-in">
             <div class="glass-panel p-8 rounded-2xl text-center max-w-md mx-auto">
-                <div class="w-16 h-16 bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">📝</div>
-                <h3 class="font-bold text-white mb-2">Kode Ujian Guru</h3>
-                <p class="text-xs text-slate-400 mb-6">Masukkan 6-digit kode unik yang diberikan guru untuk memulai ulangan.</p>
+                <div class="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">📝</div>
+                <h3 class="font-bold text-slate-800 dark:text-white mb-2">Kode Ujian Guru</h3>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mb-6">Masukkan 6-digit kode unik yang diberikan guru untuk memulai ulangan.</p>
                 <div class="flex gap-2">
-                    <input type="text" id="manual-code" class="glow-input flex-1 p-3 rounded-xl text-center font-mono font-bold uppercase placeholder-slate-600" placeholder="KODE UJIAN">
-                    <button onclick="window.handleManualCode()" class="px-6 py-3 bg-primary hover:bg-sky-500 text-slate-900 font-bold rounded-xl transition-colors">
+                    <input type="text" id="manual-code" class="glow-input flex-1 p-3 rounded-xl text-center font-mono font-bold uppercase placeholder-slate-400" placeholder="KODE UJIAN">
+                    <button onclick="window.handleManualCode()" class="px-6 py-3 bg-primary hover:bg-sky-500 text-white font-bold rounded-xl transition-colors">
                         CARI
                     </button>
                 </div>
@@ -256,41 +241,36 @@
         </div>
     </div>
 
-    <!-- SCREEN 3: KONFIRMASI (TanPA INPUT TOKEN GANDA) -->
     <div id="screen-token" class="hidden w-full max-w-md relative z-10 animate-fade-in p-4 mx-auto mt-20">
         <div class="glass-panel rounded-3xl p-8 text-center border-t-4 border-t-success relative">
-            <!-- Tombol Kembali -->
-            <button onclick="backToDashboard()" class="absolute top-4 left-4 text-slate-500 hover:text-white transition-colors" title="Kembali">
+            <button onclick="backToDashboard()" class="absolute top-4 left-4 text-slate-400 hover:text-slate-800 dark:hover:text-white transition-colors" title="Kembali">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
             </button>
             
-            <!-- Profil Siswa -->
             <div class="mb-8 mt-4">
                 <div class="relative inline-block">
                     <div class="absolute inset-0 bg-success/20 blur-xl rounded-full"></div>
                     <img src="" id="token-avatar" class="relative w-24 h-24 rounded-full object-cover bg-slate-800 mx-auto mb-4 border-2 border-success shadow-2xl">
                 </div>
-                <h3 id="confirm-name" class="text-2xl font-bold text-white mb-1 tracking-tight">NAMA</h3>
+                <h3 id="confirm-name" class="text-2xl font-bold text-slate-800 dark:text-white mb-1 tracking-tight">NAMA</h3>
                 <span id="confirm-class" class="px-3 py-1 rounded-full bg-success/10 text-success text-xs font-bold border border-success/20">KELAS</span>
             </div>
 
-            <!-- KOTAK VALIDASI PRESENSI -->
-            <div class="bg-slate-800/50 rounded-xl p-4 mb-6 text-left space-y-3 text-xs border border-white/5 mx-auto max-w-xs">
+            <div class="bg-slate-100 dark:bg-slate-800/50 rounded-xl p-4 mb-6 text-left space-y-3 text-xs border border-slate-200 dark:border-white/5 mx-auto max-w-xs">
                 <div class="flex justify-between items-center">
-                    <span class="text-slate-400">Mapel Ujian</span>
-                    <span id="confirm-mapel" class="font-bold text-white text-right truncate ml-2 w-32">...</span>
+                    <span class="text-slate-500 dark:text-slate-400">Mapel Ujian</span>
+                    <span id="confirm-mapel" class="font-bold text-slate-800 dark:text-white text-right truncate ml-2 w-32">...</span>
                 </div>
                 <div class="flex justify-between items-center">
-                    <span class="text-slate-400">Cek Presensi</span>
+                    <span class="text-slate-500 dark:text-slate-400">Cek Presensi</span>
                     <span id="status-presensi" class="font-bold flex items-center gap-1 text-slate-500">
                         <span class="animate-pulse">Menunggu...</span>
                     </span>
                 </div>
             </div>
 
-            <!-- AREA MULAI UJIAN (DIHAPUS INPUT TOKENNYA) -->
             <div id="token-input-area" class="space-y-4 opacity-50 pointer-events-none transition-opacity duration-300">
-                <p class="text-xs text-slate-400 mb-2">Pastikan baterai cukup dan koneksi stabil sebelum memulai. Layar penuh akan diaktifkan secara otomatis.</p>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mb-2">Pastikan baterai cukup dan koneksi stabil sebelum memulai. Layar penuh akan diaktifkan otomatis.</p>
                 <button onclick="startExam()" id="btn-start-exam-real" class="w-full py-4 rounded-2xl bg-gradient-to-r from-success to-emerald-600 hover:to-emerald-500 text-white font-bold shadow-lg shadow-success/25 transition-all transform hover:scale-[1.02]">
                     MULAI MENGERJAKAN
                 </button>
@@ -299,37 +279,34 @@
     </div>
 
     <div id="screen-exam" class="hidden w-full max-w-7xl h-screen relative z-10 flex flex-col md:flex-row gap-6 p-4 pt-24 md:pt-28">
-        <header id="exam-header" class="fixed top-6 left-1/2 -translate-x-1/2 w-[95%] max-w-7xl h-20 glass-panel rounded-2xl z-30 flex items-center justify-between px-6 md:px-8 shadow-2xl">
-             <div class="flex items-center gap-5">
-                <button onclick="toggleMobileNav()" class="md:hidden p-3 bg-slate-800/50 rounded-xl text-slate-300 hover:text-white border border-white/10">
+        <header id="exam-header" class="fixed top-6 left-1/2 -translate-x-1/2 w-[95%] max-w-7xl h-20 glass-panel rounded-2xl z-30 flex items-center justify-between px-4 md:px-8 shadow-2xl">
+             <div class="flex items-center gap-3 md:gap-5">
+                <button onclick="toggleMobileNav()" class="md:hidden p-2.5 bg-slate-100 dark:bg-slate-800/50 rounded-xl text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-white border border-slate-300 dark:border-white/10">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
                 </button>
                 <div class="hidden md:flex w-12 h-12 rounded-xl bg-primary/10 border border-primary/20 items-center justify-center text-primary">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                 </div>
                 <div>
-                    <h1 id="header-exam-name" class="font-bold text-white text-base md:text-lg line-clamp-1 tracking-tight">Memuat Ujian...</h1>
+                    <h1 id="header-exam-name" class="font-bold text-slate-800 dark:text-white text-sm md:text-lg line-clamp-1 tracking-tight w-32 md:w-auto">Memuat Ujian...</h1>
                     <p id="header-student-name" class="text-[10px] md:text-xs text-primary font-mono uppercase tracking-wider">SISWA</p>
                 </div>
             </div>
-            <div class="flex items-center gap-4">
-				<!-- Theme Toggle Button -->
-                <button onclick="window.toggleTheme()" class="flex p-2 bg-slate-100 dark:bg-slate-800/50 rounded-lg text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-white border border-slate-200 dark:border-white/5 transition-all mr-1" title="Mode Layar">
+            <div class="flex items-center gap-2 md:gap-4">
+                <button onclick="window.toggleTheme()" class="flex p-2 bg-slate-100 dark:bg-slate-800/50 rounded-lg text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-white border border-slate-200 dark:border-white/5 transition-all" title="Mode Layar">
                     <svg class="w-5 h-5 dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
                     <svg class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
                 </button>
-                <!-- FONT SIZE CONTROLS (ZOOM) -->
-                <div class="flex items-center gap-1 bg-slate-800/50 rounded-lg p-1 border border-white/5 mr-2">
-                    <button onclick="resizeFont(-10)" class="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 rounded transition-colors text-xs font-bold" title="Kecilkan Teks">A-</button>
-                    <button onclick="resizeFont(10)" class="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 rounded transition-colors text-lg font-bold" title="Besarkan Teks">A+</button>
+                <div class="flex items-center gap-1 bg-slate-200 dark:bg-slate-800/50 rounded-lg p-1 border border-slate-300 dark:border-white/5">
+                    <button onclick="resizeFont(-10)" class="w-6 h-6 md:w-8 md:h-8 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/10 rounded transition-colors text-xs font-bold">-</button>
+                    <button onclick="resizeFont(10)" class="w-6 h-6 md:w-8 md:h-8 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/10 rounded transition-colors text-sm font-bold">+</button>
                 </div>
-
                 <div class="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-success/10 border border-success/20 text-success text-[10px] font-bold tracking-wider">
                     <span class="w-2 h-2 rounded-full bg-success animate-pulse"></span> ONLINE
                 </div>
-                <div class="text-right">
-                    <span class="text-[10px] text-slate-400 uppercase font-bold tracking-widest block mb-1">Sisa Waktu</span>
-                    <div id="timer-display" class="font-mono text-2xl md:text-3xl font-bold text-white tracking-tight drop-shadow-md">00:00:00</div>
+                <div class="text-right ml-1">
+                    <span class="text-[9px] md:text-[10px] text-slate-500 dark:text-slate-400 uppercase font-bold tracking-widest block mb-0.5">Sisa Waktu</span>
+                    <div id="timer-display" class="font-mono text-base md:text-3xl font-bold text-slate-800 dark:text-white tracking-tight drop-shadow-md">00:00:00</div>
                 </div>
             </div>
         </header>
@@ -339,15 +316,15 @@
                 <span class="w-1.5 h-1.5 bg-emerald-400 rounded-full"></span> Tersimpan
             </div>
             
-            <div class="flex items-center justify-between mb-6 pb-6 border-b border-white/5">
+            <div class="flex items-center justify-between mb-6 pb-6 border-b border-slate-200 dark:border-white/5">
                 <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 bg-slate-800/50 rounded-xl flex items-center justify-center font-bold text-slate-400 text-xl border border-white/5 shadow-inner">
+                    <div class="w-12 h-12 bg-slate-100 dark:bg-slate-800/50 rounded-xl flex items-center justify-center font-bold text-slate-500 dark:text-slate-400 text-xl border border-slate-200 dark:border-white/5 shadow-inner">
                         <span id="q-number">1</span>
                     </div>
-                    <span id="q-type-badge" class="px-3 py-1.5 bg-slate-700/50 rounded-lg text-xs font-bold text-slate-300 border border-white/5 uppercase tracking-wide">PG</span>
+                    <span id="q-type-badge" class="px-3 py-1.5 bg-slate-200 dark:bg-slate-700/50 rounded-lg text-xs font-bold text-slate-600 dark:text-slate-300 border border-slate-300 dark:border-white/5 uppercase tracking-wide">PG</span>
                 </div>
-                <label class="flex items-center gap-3 cursor-pointer group select-none bg-slate-800/30 px-4 py-2 rounded-xl border border-white/5 hover:bg-amber-500/10 hover:border-amber-500/30 transition-all">
-                    <span class="text-xs font-bold text-slate-400 group-hover:text-amber-400 uppercase tracking-wider">Ragu-ragu</span>
+                <label class="flex items-center gap-3 cursor-pointer group select-none bg-amber-50 dark:bg-slate-800/30 px-4 py-2 rounded-xl border border-amber-200 dark:border-white/5 hover:bg-amber-100 dark:hover:bg-amber-500/10 hover:border-amber-300 dark:hover:border-amber-500/30 transition-all">
+                    <span class="text-xs font-bold text-amber-600 dark:text-slate-400 group-hover:text-amber-500 uppercase tracking-wider">Ragu-ragu</span>
                     <input type="checkbox" id="check-ragu" class="accent-amber-500 w-4 h-4 cursor-pointer">
                 </label>
             </div>
@@ -357,8 +334,8 @@
                 <div id="q-options" class="space-y-3 pb-4 soal-text"></div>
             </div>
 
-            <div class="mt-6 pt-6 border-t border-white/5 flex justify-between items-center">
-                <button onclick="prevQ()" id="btn-prev" class="px-6 py-3 border border-slate-600 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-all font-bold text-xs uppercase tracking-widest disabled:opacity-30 disabled:cursor-not-allowed">
+            <div class="mt-6 pt-6 border-t border-slate-200 dark:border-white/5 flex justify-between items-center">
+                <button onclick="prevQ()" id="btn-prev" class="px-6 py-3 border border-slate-300 dark:border-slate-600 rounded-xl text-slate-600 dark:text-slate-400 hover:text-slate-800 hover:bg-slate-100 dark:hover:text-white dark:hover:bg-slate-800 transition-all font-bold text-xs uppercase tracking-widest disabled:opacity-30 disabled:cursor-not-allowed">
                     Kembali
                 </button>
                 <button onclick="nextQ()" id="btn-next" class="px-8 py-3 bg-gradient-to-r from-primary to-accent hover:to-indigo-500 text-white font-bold rounded-xl shadow-lg shadow-primary/20 transition-all transform hover:-translate-y-0.5 text-xs uppercase tracking-widest">
@@ -371,16 +348,16 @@
         </div>
 
         <div class="hidden md:flex w-80 flex-none glass-panel rounded-3xl p-6 flex-col shadow-xl h-full max-h-[calc(100vh-140px)]">
-            <h3 class="text-center text-xs font-bold text-slate-400 mb-6 uppercase tracking-[0.2em] border-b border-white/5 pb-4">Navigasi Soal</h3>
+            <h3 class="text-center text-xs font-bold text-slate-500 dark:text-slate-400 mb-6 uppercase tracking-[0.2em] border-b border-slate-200 dark:border-white/5 pb-4">Navigasi Soal</h3>
             <div id="nav-grid" class="grid grid-cols-5 gap-3 overflow-y-auto flex-1 content-start custom-scrollbar pr-2 pb-4"></div>
-            <div class="mt-4 pt-4 border-t border-white/5 space-y-3">
-                <div class="flex items-center gap-3 text-[10px] text-slate-400 font-medium uppercase tracking-wide">
+            <div class="mt-4 pt-4 border-t border-slate-200 dark:border-white/5 space-y-3">
+                <div class="flex items-center gap-3 text-[10px] text-slate-500 dark:text-slate-400 font-medium uppercase tracking-wide">
                     <div class="w-3 h-3 bg-primary rounded-md shadow-[0_0_8px_#0ea5e9]"></div> Sedang Dikerjakan
                 </div>
-                <div class="flex items-center gap-3 text-[10px] text-slate-400 font-medium uppercase tracking-wide">
+                <div class="flex items-center gap-3 text-[10px] text-slate-500 dark:text-slate-400 font-medium uppercase tracking-wide">
                     <div class="w-3 h-3 bg-success/20 border border-success text-success rounded-md flex items-center justify-center">✓</div> Terjawab
                 </div>
-                <div class="flex items-center gap-3 text-[10px] text-slate-400 font-medium uppercase tracking-wide">
+                <div class="flex items-center gap-3 text-[10px] text-slate-500 dark:text-slate-400 font-medium uppercase tracking-wide">
                     <div class="w-3 h-3 bg-warning/20 border border-warning text-warning rounded-md"></div> Ragu-ragu
                 </div>
             </div>
@@ -388,10 +365,10 @@
     </div>
 
     <div id="mobile-nav-overlay" class="fixed inset-0 z-40 bg-black/80 backdrop-blur-sm hidden flex-col justify-end md:hidden animate-fade-in" onclick="if(event.target===this) toggleMobileNav()">
-        <div class="bg-surface border-t border-white/10 p-6 rounded-t-3xl max-h-[70vh] overflow-y-auto">
+        <div class="bg-white dark:bg-surface border-t border-slate-200 dark:border-white/10 p-6 rounded-t-3xl max-h-[70vh] overflow-y-auto">
             <div class="flex justify-between items-center mb-6">
-                <h3 class="text-white font-bold tracking-tight">Daftar Soal</h3>
-                <button onclick="toggleMobileNav()" class="p-2 bg-slate-800 rounded-full text-slate-400">
+                <h3 class="text-slate-800 dark:text-white font-bold tracking-tight">Daftar Soal</h3>
+                <button onclick="toggleMobileNav()" class="p-2 bg-slate-100 dark:bg-slate-800 rounded-full text-slate-500 dark:text-slate-400">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
             </div>
@@ -402,7 +379,7 @@
     <div id="summary-modal" class="fixed inset-0 z-50 bg-black/90 hidden items-center justify-center p-4 backdrop-blur-sm">
         <div class="glass-panel w-full max-w-2xl rounded-3xl p-8 border border-white/10 animate-fade-in relative overflow-hidden">
             <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary via-success to-primary"></div>
-            <h3 class="text-2xl font-bold text-white mb-8 tracking-tight">Konfirmasi Selesai</h3>
+            <h3 class="text-2xl font-bold text-slate-800 dark:text-white mb-8 tracking-tight">Konfirmasi Selesai</h3>
             <div class="grid grid-cols-3 gap-4 mb-8">
                 <div class="bg-success/10 border border-success/20 p-4 rounded-2xl text-center">
                     <span id="sum-answered" class="text-3xl font-bold text-success block mb-1">0</span>
@@ -412,14 +389,14 @@
                     <span id="sum-ragu" class="text-3xl font-bold text-warning block mb-1">0</span>
                     <span class="text-[10px] text-warning/70 uppercase font-bold tracking-wider">Ragu</span>
                 </div>
-                <div class="bg-slate-700/30 border border-slate-600/30 p-4 rounded-2xl text-center">
-                    <span id="sum-empty" class="text-3xl font-bold text-slate-400 block mb-1">0</span>
+                <div class="bg-slate-200/50 dark:bg-slate-700/30 border border-slate-300 dark:border-slate-600/30 p-4 rounded-2xl text-center">
+                    <span id="sum-empty" class="text-3xl font-bold text-slate-500 dark:text-slate-400 block mb-1">0</span>
                     <span class="text-[10px] text-slate-500 uppercase font-bold tracking-wider">Kosong</span>
                 </div>
             </div>
             <div id="summary-grid" class="grid grid-cols-8 sm:grid-cols-10 gap-2 mb-8 max-h-48 overflow-y-auto custom-scrollbar pr-2"></div>
-            <div class="flex justify-end gap-3 pt-6 border-t border-white/5">
-                <button onclick="closeSummary()" class="px-6 py-3 border border-slate-600 text-slate-300 rounded-xl hover:bg-slate-800 transition-all font-bold text-sm">Batal</button>
+            <div class="flex justify-end gap-3 pt-6 border-t border-slate-300 dark:border-white/5">
+                <button onclick="closeSummary()" class="px-6 py-3 border border-slate-400 dark:border-slate-600 text-slate-600 dark:text-slate-300 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-all font-bold text-sm">Batal</button>
                 <button onclick="confirmFinish()" class="px-8 py-3 bg-gradient-to-r from-success to-emerald-600 hover:to-emerald-500 text-white rounded-xl font-bold shadow-lg shadow-success/20 transition-all text-sm transform hover:scale-[1.02]">
                     Kumpulkan Jawaban
                 </button>
@@ -432,30 +409,31 @@
             <div class="w-24 h-24 mx-auto mb-6 rounded-full bg-success/10 border border-success/30 flex items-center justify-center shadow-[0_0_40px_rgba(16,185,129,0.2)]">
                 <svg class="w-10 h-10 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
             </div>
-            <h2 class="text-3xl font-bold text-white mb-2 tracking-tight">UJIAN SELESAI</h2>
+            <h2 class="text-3xl font-bold text-slate-800 dark:text-white mb-2 tracking-tight">UJIAN SELESAI</h2>
             <p class="text-success text-xs uppercase tracking-widest mb-10 font-bold bg-success/5 py-2 rounded-lg inline-block px-4 border border-success/10">Jawaban berhasil disimpan</p>
             
-            <div id="score-box" class="hidden mb-8 bg-slate-900/50 p-8 rounded-3xl border border-slate-700/50 relative group">
+            <div id="score-box" class="hidden mb-8 bg-slate-100 dark:bg-slate-900/50 p-8 rounded-3xl border border-slate-200 dark:border-slate-700/50 relative group">
                 <div class="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                <p class="text-xs text-slate-400 font-bold uppercase tracking-widest mb-2">Nilai Anda</p>
-                <p id="final-score" class="text-7xl font-bold text-white font-mono tracking-tighter drop-shadow-lg">0</p>
+                <p class="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest mb-2">Nilai Anda</p>
+                <p id="final-score" class="text-7xl font-bold text-slate-800 dark:text-white font-mono tracking-tighter drop-shadow-lg">0</p>
             </div>
             
-            <div id="waiting-box" class="hidden mb-8 bg-warning/5 p-8 rounded-3xl border border-warning/20">
+            <div id="waiting-box" class="hidden mb-8 bg-warning/10 dark:bg-warning/5 p-8 rounded-3xl border border-warning/20">
                 <div class="animate-pulse">
                     <p class="text-warning font-bold text-lg mb-2">MENUNGGU HASIL</p>
-                    <p class="text-slate-400 text-xs">Nilai sedang diproses oleh guru.</p>
+                    <p class="text-slate-500 dark:text-slate-400 text-xs">Nilai sedang diproses oleh guru.</p>
                 </div>
             </div>
             
-            <button onclick="location.reload()" class="w-full py-4 rounded-xl border border-slate-600 text-slate-300 hover:text-white hover:bg-slate-800 transition-all font-bold tracking-wider text-sm">KEMBALI KE BERANDA</button>
+            <button onclick="location.reload()" class="w-full py-4 rounded-xl border border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:text-slate-800 hover:bg-slate-100 dark:hover:text-white dark:hover:bg-slate-800 transition-all font-bold tracking-wider text-sm">KEMBALI KE BERANDA</button>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-		import { getFirestore, doc, getDoc, getDocs, setDoc, updateDoc, serverTimestamp, onSnapshot, collection, query, where } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, getDocs, setDoc, updateDoc, serverTimestamp, onSnapshot, collection, query, where } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        
         const firebaseConfig = {
             apiKey: "AIzaSyAwIwimlyrE4qQqYa2gA8Pfygd59USsveQ",
             authDomain: "aplikasi-ulangan-01.firebaseapp.com",
@@ -465,17 +443,14 @@
             appId: "1:409085062439:web:280589d1a3e12e7b980d02"
         };
 
-        let db, auth, userId, studentData, examData, questions = [], answers = [], currentIndex = 0, timerInterval, cheatCount = 0, examEndTime;
+        let db, auth, studentData, examData, questions = [], answers = [], currentIndex = 0, timerInterval, cheatCount = 0, examEndTime;
         let isSubmitting = false;
         window.isUploading = false;
         let uploadTimeout;
-        let lastCheatTime = 0; // Debounce Timer
-        let currentFontSize = 100; // Persentase Zoom Font
+        let lastCheatTime = 0; 
+        let currentFontSize = 100; 
         
-        let resultListener = null;
-        let examListener = null;
-        let statusListener = null; // NEW: Listener status real-time
-        let heartbeatInterval = null; // NEW: Interval detak jantung aman
+        let resultListener = null, examListener = null, statusListener = null, heartbeatInterval = null;
 
         // --- SISTEM UPLOAD AMAN ---
         window.setUploading = (status) => {
@@ -484,14 +459,11 @@
                 clearTimeout(uploadTimeout);
             } else {
                 clearTimeout(uploadTimeout);
-                // Jeda 3 detik untuk menyerap event kembalinya browser lambat
-                uploadTimeout = setTimeout(() => {
-                    window.isUploading = false;
-                }, 3000); 
+                uploadTimeout = setTimeout(() => { window.isUploading = false; }, 3000); 
             }
         };
 
-		// --- THEME TOGGLE LOGIC ---
+        // --- THEME TOGGLE LOGIC ---
         window.toggleTheme = () => {
             document.documentElement.classList.toggle('dark');
             localStorage.theme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
@@ -506,46 +478,35 @@
         // --- FORMAT NIS OTOMATIS KEMBALI ---
         window.formatNIS = (input) => {
             let val = input.value.replace(/\D/g, '');
-            if (val.length > 4) val = val.substring(0, 4) + '.' + val.substring(4);
-            if (val.length > 7) val = val.substring(0, 7) + '.' + val.substring(7);
-            input.value = val;
+            let formatted = '';
+            if (val.length > 0) formatted += val.substring(0, 4);
+            if (val.length > 4) formatted += '.' + val.substring(4, 6);
+            if (val.length > 6) formatted += '.' + val.substring(6, 9);
+            input.value = formatted;
         };
 
-        // --- TITLE CASE HELPER ---
-        function toTitleCase(str) {
-            return str.replace(/\w\S*/g, function(txt){
-                return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
-            });
-        }
-
-        // --- SCREEN SWITCHING LOGIC FIXED ---
+        // --- SCREEN SWITCHING ---
         window.switchScreen = (id) => {
-            // Sembunyikan semua screen, termasuk screen-dashboard yang tadinya tertinggal
             ['screen-login', 'screen-dashboard', 'screen-token', 'screen-exam', 'screen-result'].forEach(s => {
                 const el = document.getElementById(s);
                 if (el) el.classList.add('hidden');
             });
-            // Tampilkan screen target
             const target = document.getElementById(id);
             if (target) target.classList.remove('hidden');
         };
 
-        window.preventCheating = (e) => { if (e.ctrlKey || e.key === 'F12') return false; };
-
-        // --- FONT SIZE CONTROL (ZOOM) ---
+        window.preventCheating = (e) => { if (e.ctrlKey || e.key === 'F12' || (e.altKey && e.key === 'Tab')) return false; };
         window.resizeFont = (delta) => {
             currentFontSize += delta;
             if(currentFontSize < 80) currentFontSize = 80;
             if(currentFontSize > 160) currentFontSize = 160;
-            
             const qContent = document.getElementById('q-content');
             const qOptions = document.getElementById('q-options');
-            
             if(qContent) qContent.style.fontSize = `${currentFontSize}%`;
             if(qOptions) qOptions.style.fontSize = `${currentFontSize}%`;
         };
         
-        // --- SECURITY SYSTEM ---
+        // --- SUPER SECURITY SYSTEM (ANTI-CHEAT) FIXED ---
         function getCheatLimit() {
             if (!examData) return 3;
             return (examData.maxCurang !== undefined && examData.maxCurang !== null && examData.maxCurang !== "") ? parseInt(examData.maxCurang) : 3;
@@ -553,101 +514,78 @@
 
         function updateCheatCount() {
             const now = Date.now();
-            if (now - lastCheatTime < 2000) return; // Prevent rapid fire
+            // JEDA PENDINGIN (COOLDOWN) 3 Detik: Menghentikan lompatan ganda saat split-screen
+            if (now - lastCheatTime < 3000) return false; 
             
             lastCheatTime = now;
             cheatCount++; 
             
-            // Simpan ke LocalStorage & Server
             if(examData && studentData) {
                 localStorage.setItem(`cheat_${examData.kodeUjian}_${studentData.nis}`, cheatCount);
                 const resRef = doc(db, 'hasil_ujian', `${examData.kodeUjian}_${studentData.nis}`);
                 updateDoc(resRef, { pelanggaran: cheatCount }).catch(e=>{});
             }
-
-            checkSecurityStatus();
+            return true;
         }
 
         function checkSecurityStatus() {
             const limit = getCheatLimit();
-            
             if (cheatCount > limit) {
-                // LOCKDOWN
                 document.getElementById('warning-modal').classList.add('hidden');
                 document.getElementById('warning-modal').classList.remove('flex');
-                document.getElementById('fullscreen-blocker').style.display = 'none';
+                
+                const blocker = document.getElementById('fullscreen-blocker');
+                if(blocker) blocker.style.display = 'none';
                 
                 document.getElementById('lock-modal').classList.remove('hidden');
                 document.getElementById('lock-modal').classList.add('flex');
-            } else if (cheatCount > 0) {
-                // WARNING
-                document.getElementById('violation-count-display').textContent = cheatCount;
-                if (document.getElementById('lock-modal').classList.contains('hidden')) {
-                    document.getElementById('warning-modal').classList.remove('hidden');
-                    document.getElementById('warning-modal').classList.add('flex');
-                }
             }
         }
 
-        // --- SUPER SECURITY SYSTEM (ANTI-CHEAT) ---
-        
         function triggerWarning(reasonTitle, reasonText) {
-            updateCheatCount();
-            const limit = getCheatLimit();
-            if (cheatCount <= limit) {
-                // Ubah teks modal sesuai pelanggaran secara dinamis
-                document.querySelector('#warning-modal h2').innerText = reasonTitle;
-                document.querySelector('#warning-modal p').innerText = reasonText;
-                
-                // Pastikan fullscreen blocker sembunyi agar tidak tumpang tindih
-                document.getElementById('fullscreen-blocker').style.display = 'none';
-            }
-        }
-
-        // Detector 1: Tab Switch (Ganti Tab / Minimize)
-        document.addEventListener("visibilitychange", () => {
-            if (window.isUploading || isSubmitting || document.getElementById('screen-exam').classList.contains('hidden')) return;
-            if (document.hidden) {
-                triggerWarning("GANTI TAB / MINIMIZE!", "Anda terdeteksi meninggalkan halaman ujian.");
-            }
-        });
-
-        // Detector 2: Kehilangan Fokus (Anti-Floating Window / PIP)
-        window.addEventListener("blur", () => {
-            if (window.isUploading || isSubmitting || document.getElementById('screen-exam').classList.contains('hidden')) return;
-            triggerWarning("FOKUS HILANG!", "Anda terdeteksi menyentuh aplikasi lain (Kalkulator Melayang/WhatsApp/Notifikasi).");
-        });
-
-        // Detector 3 & 4: Exit Fullscreen & Resize (Anti-Split Screen & Gestur Navigasi)
-        const handleFullscreenChange = () => {
-            if (isSubmitting || window.isUploading || document.getElementById('screen-exam').classList.contains('hidden')) return;
-
-            const isSupported = document.fullscreenEnabled || document.webkitFullscreenEnabled;
-            const isFull = document.fullscreenElement || document.webkitFullscreenElement;
-
-            if (isSupported && !isFull) {
-                updateCheatCount();
+            const isAdded = updateCheatCount();
+            if (isAdded) {
                 const limit = getCheatLimit();
                 if (cheatCount <= limit) {
-                    // Sembunyikan warning modal biasa, gunakan blocker khusus layar penuh
-                    document.getElementById('warning-modal').classList.add('hidden');
-                    document.getElementById('warning-modal').classList.remove('flex');
+                    document.getElementById('warning-title').innerText = reasonTitle;
+                    document.getElementById('warning-text').innerText = reasonText;
+                    document.getElementById('violation-count-display').textContent = cheatCount;
                     
                     const blocker = document.getElementById('fullscreen-blocker');
-                    blocker.style.display = 'flex';
-                    document.querySelector('#fullscreen-blocker h2').innerText = "LAYAR PENUH DIPERLUKAN";
-                    document.querySelector('#fullscreen-blocker p').innerText = "Anda terdeteksi melakukan Split-Screen atau mengusap menu navigasi.";
+                    if(blocker) blocker.style.display = 'none';
+
+                    document.getElementById('warning-modal').classList.remove('hidden');
+                    document.getElementById('warning-modal').classList.add('flex');
+                } else {
+                    checkSecurityStatus(); 
                 }
-            } else {
-                document.getElementById('fullscreen-blocker').style.display = 'none';
+            }
+        }
+
+        document.addEventListener("visibilitychange", () => {
+            if (window.isUploading || isSubmitting || document.getElementById('screen-exam').classList.contains('hidden')) return;
+            if (document.hidden) triggerWarning("GANTI TAB / MINIMIZE!", "Anda terdeteksi meninggalkan halaman ujian.");
+        });
+
+        window.addEventListener("blur", () => {
+            if (window.isUploading || isSubmitting || document.getElementById('screen-exam').classList.contains('hidden')) return;
+            triggerWarning("FOKUS HILANG!", "Anda terdeteksi membuka aplikasi melayang atau notifikasi.");
+        });
+
+        const handleFullscreenChange = () => {
+            if (isSubmitting || window.isUploading || document.getElementById('screen-exam').classList.contains('hidden')) return;
+            
+            const isSupported = document.fullscreenEnabled || document.webkitFullscreenEnabled;
+            const isFull = document.fullscreenElement || document.webkitFullscreenElement;
+            
+            if (isSupported && !isFull) {
+                triggerWarning("LAYAR PENUH BATAL!", "Anda keluar dari layar penuh atau melakukan Split-Screen.");
             }
         };
 
         window.addEventListener("resize", () => {
             if (window.isUploading || isSubmitting || document.getElementById('screen-exam').classList.contains('hidden')) return;
-            if (!document.fullscreenElement && !document.webkitFullscreenElement) {
-                handleFullscreenChange(); 
-            }
+            if (!document.fullscreenElement && !document.webkitFullscreenElement) handleFullscreenChange(); 
         });
 
         document.addEventListener("fullscreenchange", handleFullscreenChange);
@@ -658,15 +596,9 @@
         window.dismissWarning = () => {
             document.getElementById('warning-modal').classList.add('hidden');
             document.getElementById('warning-modal').classList.remove('flex');
-            if (!document.fullscreenElement) requestFullScreenAgain();
-        };
-
-        window.requestFullScreenAgain = () => {
             document.documentElement.requestFullscreen().catch(e=>{});
-            document.getElementById('fullscreen-blocker').style.display = 'none'; // Sembunyikan manual setelah diklik
         };
 
-        // Unlock Logic
         window.attemptUnlock = () => {
             const pin = document.getElementById('input-pin-unlock').value;
             if(pin === examData.pinReset) {
@@ -674,7 +606,6 @@
                 document.getElementById('lock-modal').classList.remove('flex');
                 document.getElementById('input-pin-unlock').value = '';
                 
-                // Beri 1 kesempatan terakhir (Reset ke limit)
                 const limit = getCheatLimit();
                 cheatCount = Math.max(0, limit); 
                 lastCheatTime = Date.now();
@@ -686,13 +617,18 @@
                 updateDoc(resRef, { pelanggaran: cheatCount }).catch(e=>{});
 
                 alert("Gembok terbuka! Kesempatan TERAKHIR. Jangan keluar lagi.");
-                requestFullScreenAgain();
+                document.documentElement.requestFullscreen().catch(e=>{});
             } else {
                 alert("PIN Guru Salah!");
             }
         };
 
         // --- CORE LOGIC ---
+        function toTitleCase(str) {
+            return str.replace(/\w\S*/g, function(txt){
+                return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+            });
+        }
 
         (async function() {
             const app = initializeApp(firebaseConfig);
@@ -701,30 +637,16 @@
             await signInAnonymously(auth);
         })();
 
-        // TIME FIX UTILITY (WIB FORCE)
-        function getIndoDateString() {
-            const now = new Date();
-            const utcMs = now.getTime(); // Absolute UTC timestamp
-            const wibOffset = 7 * 60 * 60 * 1000; // +7 Jam (WIB)
-            const wibDate = new Date(utcMs + wibOffset); 
-            return wibDate.toISOString().split('T')[0];
-        }
-
         window.checkNIS = async () => {
             const rawNis = document.getElementById('input-nis').value.trim();
             if(!rawNis) return alert('Isi NIS!');
             
             showLoading(true, "MEMUAT DATA SISWA...");
             try {
-                // 1. Coba langsung dengan input mentah (Bisa dengan titik)
                 let snap = await getDoc(doc(db, 'siswa', rawNis));
-                
-                // 2. Jika tidak ketemu, coba hapus semua karakter selain angka/huruf
                 if (!snap.exists()) {
                     const cleanNis = rawNis.replace(/[^0-9a-zA-Z]/g, '');
                     snap = await getDoc(doc(db, 'siswa', cleanNis));
-                    
-                    // 3. Jika masih tidak ketemu & formatnya 9 angka (Cth: 242510123), coba tambahkan titik sesuai standar sekolah
                     if (!snap.exists() && cleanNis.length === 9) {
                         const fmt = `${cleanNis.substring(0,4)}.${cleanNis.substring(4,6)}.${cleanNis.substring(6)}`;
                         snap = await getDoc(doc(db, 'siswa', fmt));
@@ -733,16 +655,11 @@
 
                 if(snap.exists()) {
                     studentData = { nis: snap.id, ...snap.data() };
-                    
-                    // Update Info Dashboard
                     document.getElementById('dash-name').textContent = studentData.nama;
                     document.getElementById('dash-kelas').textContent = studentData.kelas;
                     document.getElementById('dash-nis').textContent = studentData.nis;
                     document.getElementById('dash-avatar').src = studentData.foto || `https://ui-avatars.com/api/?name=${studentData.nama}&background=38bdf8&color=fff`;
-                    
-                    // Load Ujian Sekolah (Otomatis)
                     await loadSchoolExams();
-                    
                     switchScreen('screen-dashboard');
                 } else {
                     alert('NIS tidak ditemukan di database.');
@@ -751,7 +668,6 @@
             showLoading(false);
         };
 
-        // --- DASHBOARD LOGIC ---
         window.switchTab = (tab) => {
             const s = document.getElementById('tab-sekolah');
             const h = document.getElementById('tab-harian');
@@ -775,31 +691,29 @@
                 const q = query(
                     collection(db, 'ujian_terjadwal'),
                     where('targetKelas', 'array-contains', studentData.kelas),
-                    where('jenis_ujian', '==', 'TERPUSAT'), // Hanya yang dari PKA
+                    where('jenis_ujian', '==', 'TERPUSAT'), 
                     where('status', '==', 'aktif')
                 );
-                
                 const snap = await getDocs(q);
                 if(snap.empty) {
-                    container.innerHTML = `<div class="col-span-full text-center py-10 text-slate-500 bg-slate-800/30 rounded-xl border border-dashed border-slate-700">Tidak ada ujian sekolah aktif.</div>`;
+                    container.innerHTML = `<div class="col-span-full text-center py-10 text-slate-500 bg-slate-100 dark:bg-slate-800/30 rounded-xl border border-dashed border-slate-300 dark:border-slate-700">Tidak ada ujian sekolah aktif.</div>`;
                     return;
                 }
-
                 let html = '';
                 snap.forEach(d => {
                     const data = d.data();
                     html += `
-                    <div onclick="prepareExam('${d.id}')" class="bg-slate-800/50 p-5 rounded-xl border border-white/5 relative overflow-hidden group cursor-pointer hover:border-primary/50 transition-all">
+                    <div onclick="prepareExam('${d.id}')" class="bg-white dark:bg-slate-800/50 p-5 rounded-xl border border-slate-200 dark:border-white/5 relative overflow-hidden group cursor-pointer hover:border-primary/50 transition-all shadow-sm">
                         <div class="absolute top-0 left-0 w-1 h-full bg-primary"></div>
                         <div class="flex justify-between items-start mb-2">
-                            <h3 class="font-bold text-white text-lg leading-tight group-hover:text-primary transition-colors">${data.namaUjian}</h3>
+                            <h3 class="font-bold text-slate-800 dark:text-white text-lg leading-tight group-hover:text-primary transition-colors">${data.namaUjian}</h3>
                             <span class="px-2 py-1 bg-primary/10 text-primary text-[10px] font-bold rounded border border-primary/20">TERPUSAT</span>
                         </div>
-                        <div class="flex gap-4 text-xs text-slate-400 mb-4">
+                        <div class="flex gap-4 text-xs text-slate-500 dark:text-slate-400 mb-4">
                             <span>⏱️ ${data.durasiMenit} Menit</span>
                             <span>📝 ${data.daftarIdSoal.length} Soal</span>
                         </div>
-                        <button class="w-full py-2 bg-slate-700 group-hover:bg-primary group-hover:text-slate-900 text-white text-xs font-bold rounded-lg transition-all">PILIH UJIAN</button>
+                        <button class="w-full py-2 bg-slate-100 dark:bg-slate-700 group-hover:bg-primary group-hover:text-white text-slate-600 dark:text-white text-xs font-bold rounded-lg transition-all">PILIH UJIAN</button>
                     </div>`;
                 });
                 container.innerHTML = html;
@@ -812,7 +726,6 @@
             prepareExam(code);
         };
 
-        // --- EXAM PREPARATION ---
         window.prepareExam = async (examId) => {
             showLoading(true, "VERIFIKASI UJIAN...");
             try {
@@ -822,18 +735,15 @@
                 examData = snap.data();
                 if(!examData.kodeUjian) examData.kodeUjian = snap.id;
 
-                if(examData.status !== 'aktif') throw new Error(`Ujian "${examData.namaUjian}" belum diaktifkan oleh guru.`);
+                if(examData.status !== 'aktif') throw new Error(`Ujian "${examData.namaUjian}" belum diaktifkan.`);
                 if(!examData.targetSemuaKelas && !examData.targetKelas.includes(studentData.kelas)) throw new Error(`Ujian ini bukan untuk kelas ${studentData.kelas}.`);
 
-                // Isi Info Layar Token
                 document.getElementById('confirm-name').innerText = studentData.nama;
                 document.getElementById('confirm-class').innerText = studentData.kelas;
                 document.getElementById('token-avatar').src = studentData.foto || `https://ui-avatars.com/api/?name=${studentData.nama}`;
                 document.getElementById('confirm-mapel').innerText = examData.mapel || examData.namaUjian;
                 
-                // CEK PRESENSI
                 await verifyAttendance();
-                
                 switchScreen('screen-token');
             } catch(e) { alert(e.message); }
             showLoading(false);
@@ -841,13 +751,11 @@
 
         window.backToDashboard = () => switchScreen('screen-dashboard');
 
-        // --- CEK PRESENSI ---
         async function verifyAttendance() {
             const statusEl = document.getElementById('status-presensi');
             const tokenArea = document.getElementById('token-input-area');
             
             statusEl.innerHTML = '<span class="animate-pulse text-warning">Cek Database...</span>';
-            // Disable start sementara dengan memudarkan areanya
             tokenArea.classList.add('opacity-50', 'pointer-events-none');
 
             try {
@@ -858,11 +766,8 @@
                 
                 let presensiId = '';
                 if (examData.jenis_ujian === 'TERPUSAT') {
-                    // Cek data Pengawas Ruang (Format: Kelas_Tanggal)
                     presensiId = `${studentData.kelas}_${today}`;
                 } else {
-                    // Cek data Guru Mapel (Format: Kelas_Mapel_Tanggal)
-                    // FIX: Seragamkan kapitalisasi mapel (Title Case) agar cocok dengan database presensi
                     const mapel = toTitleCase(examData.mapel || 'UMUM');
                     presensiId = `${studentData.kelas}_${mapel}_${today}`;
                 }
@@ -880,9 +785,7 @@
                     tokenArea.classList.remove('opacity-50', 'pointer-events-none');
                 } else {
                     statusEl.innerHTML = '<span class="text-danger font-bold">✕ BELUM ABSEN</span>';
-                    let pesan = examData.jenis_ujian === 'TERPUSAT' 
-                        ? "Anda belum diabsen oleh Pengawas Ruang." 
-                        : "Anda belum diabsen oleh Guru Mata Pelajaran.";
+                    let pesan = examData.jenis_ujian === 'TERPUSAT' ? "Anda belum diabsen oleh Pengawas Ruang." : "Anda belum diabsen oleh Guru Mata Pelajaran.";
                     alert(`PERINGATAN: ${pesan}\nSilakan melapor agar tombol Mulai diaktifkan.`);
                 }
             } catch(e) {
@@ -891,31 +794,24 @@
             }
         }
 
-        // --- FUNGSI PENGACAKAN CERDAS ---
         function smartShuffle(daftarSoal) {
             const groups = new Map();
             const singles = [];
-
             daftarSoal.forEach(soal => {
                 const gid = soal.metadata && soal.metadata.groupId ? soal.metadata.groupId : null;
                 if (gid) {
                     if (!groups.has(gid)) groups.set(gid, []);
                     groups.get(gid).push(soal);
-                } else {
-                    singles.push(soal);
-                }
+                } else singles.push(soal);
             });
-
             for (let [gid, groupList] of groups) {
                 groupList.sort((a, b) => {
                     const lenA = (a.naskah || "").length;
                     const lenB = (b.naskah || "").length;
-                    return lenB - lenA; // Descending
+                    return lenB - lenA; 
                 });
             }
-
             let blocks = [ ...singles, ...Array.from(groups.values()) ];
-
             for (let i = blocks.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
                 [blocks[i], blocks[j]] = [blocks[j], blocks[i]];
@@ -930,7 +826,6 @@
             }
         }
 
-        // --- START EXAM ---
         window.startExam = async () => {
             const code = examData.kodeUjian;
             if(!code) return alert('Data Ujian Tidak Valid!');
@@ -943,7 +838,6 @@
             showLoading(true, "MENYIAPKAN SOAL...");
             
             try {
-                // Pastikan ujian masih valid & ambil status terbaru (Opsional tapi aman)
                 const snap = await getDoc(doc(db, 'ujian_terjadwal', code));
                 if(!snap.exists()) throw new Error('Kode Ujian Tidak Valid');
                 examData = snap.data();
@@ -951,7 +845,6 @@
 
                 const resRef = doc(db, 'hasil_ujian', `${code}_${studentData.nis}`);
                 const resSnap = await getDoc(resRef);
-
                 const cheatKey = `cheat_${code}_${studentData.nis}`;
                 
                 if(!resSnap.exists()) {
@@ -965,13 +858,11 @@
                 } else {
                     const rData = resSnap.data();
                     const isRestricted = examData.settingBatasiSatuKali !== false; 
-
                     if(isRestricted && (rData.status === 'selesai' || rData.status === 'suspended')) {
                         monitorResult(`${code}_${studentData.nis}`, code);
                         showLoading(false);
                         return;
                     }
-                    
                     cheatCount = rData.pelanggaran || 0;
                     localStorage.setItem(cheatKey, cheatCount);
                     await updateDoc(resRef, { status: 'mengerjakan', lastHeartbeat: serverTimestamp() });
@@ -1015,9 +906,7 @@
                     }
                 } else {
                     finalQuestions = [...questions];
-                    if(examData.settingAcakSoal) {
-                        finalQuestions = smartShuffle(finalQuestions);
-                    }
+                    if(examData.settingAcakSoal) finalQuestions = smartShuffle(finalQuestions);
                     const newOrder = finalQuestions.map(q => q.id);
                     localStorage.setItem(orderKey, JSON.stringify(newOrder));
                 }
@@ -1046,7 +935,6 @@
                 document.getElementById('exam-header').classList.remove('hidden');
                 document.getElementById('exam-header').classList.add('flex');
                 
-                // LIVE MONITORING LISTENER
                 startStatusListener(resRef);
                 startHeartbeat(resRef);
 
@@ -1059,19 +947,15 @@
             showLoading(false);
         };
 
-        // --- LIVE MONITORING FUNCTIONS ---
         function startStatusListener(docRef) {
             if (statusListener) statusListener(); 
-            
             statusListener = onSnapshot(docRef, (docSnap) => {
                 if (docSnap.exists()) {
                     const data = docSnap.data();
-                    
                     if (data.status === 'suspended') {
                         clearInterval(timerInterval);
                         clearInterval(heartbeatInterval);
                         statusListener(); 
-                        
                         alert("MAAF, UJIAN ANDA DIHENTIKAN OLEH PENGAWAS (DISKUALIFIKASI).");
                         location.reload(); 
                     }
@@ -1079,7 +963,6 @@
                         clearInterval(timerInterval);
                         clearInterval(heartbeatInterval);
                         statusListener();
-                        
                         alert("Waktu ujian telah dihentikan oleh Pengawas.");
                         finishExam(); 
                     }
@@ -1089,18 +972,11 @@
 
         function startHeartbeat(docRef) {
             if (heartbeatInterval) clearInterval(heartbeatInterval);
-            
             heartbeatInterval = setInterval(async () => {
                 if (!isSubmitting) {
-                    try {
-                        await updateDoc(docRef, {
-                            lastHeartbeat: serverTimestamp()
-                        });
-                    } catch (e) {
-                        console.error("Heartbeat fail", e);
-                    }
+                    try { await updateDoc(docRef, { lastHeartbeat: serverTimestamp() }); } catch (e) {}
                 }
-            }, 30000); // 30 Detik
+            }, 30000); 
         }
 
         const compressImage = (base64Str) => {
@@ -1146,17 +1022,17 @@
                 q.opsi.forEach((o, i) => {
                     const isSel = savedVal == o.originalIndex;
                     const div = document.createElement('div');
-                    div.className = `flex items-center gap-4 p-4 border rounded-2xl cursor-pointer transition-all duration-200 group ${isSel ? 'border-primary bg-primary/10 shadow-[0_0_15px_rgba(56,189,248,0.2)]' : 'border-slate-700 bg-slate-800/30 hover:bg-slate-800 hover:border-slate-500'}`;
+                    div.className = `flex items-center gap-4 p-4 border rounded-2xl cursor-pointer transition-all duration-200 group ${isSel ? 'border-primary bg-primary/10 shadow-[0_0_15px_rgba(56,189,248,0.2)]' : 'bg-white dark:bg-slate-800/30 border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 hover:border-slate-400 dark:hover:border-slate-500'}`;
                     div.onclick = () => saveAns(o.originalIndex);
-                    div.innerHTML = `<div class="w-10 h-10 rounded-xl border flex items-center justify-center font-bold text-sm transition-colors ${isSel ? 'bg-primary text-slate-900 border-primary' : 'bg-slate-800 border-slate-600 text-slate-400 group-hover:text-white'}">${String.fromCharCode(65+i)}</div><div class="flex-1 text-slate-300 font-medium leading-relaxed group-hover:text-white transition-colors">${o.text}${o.imageBase64 ? `<br><img src="${o.imageBase64}" class="mt-2 h-24 rounded-lg border border-white/10">` : ''}</div>`;
+                    div.innerHTML = `<div class="w-10 h-10 rounded-xl border flex items-center justify-center font-bold text-sm transition-colors ${isSel ? 'bg-primary text-white border-primary' : 'bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-400 group-hover:text-primary dark:group-hover:text-white'}">${String.fromCharCode(65+i)}</div><div class="flex-1 text-slate-700 dark:text-slate-300 font-medium leading-relaxed group-hover:text-slate-900 dark:group-hover:text-white transition-colors">${o.text}${o.imageBase64 ? `<br><img src="${o.imageBase64}" class="mt-2 h-24 rounded-lg border border-slate-300 dark:border-white/10">` : ''}</div>`;
                     containerO.appendChild(div);
                 });
             } else if(q.type === 'bs') {
-                let t = `<div class="border border-slate-700 rounded-2xl overflow-x-auto"><table class="w-full text-sm min-w-[400px]"><thead class="bg-slate-800 text-slate-300 font-bold border-b border-slate-700"><tr><th class="p-4 text-left">Pernyataan</th><th class="p-4 w-16 text-center">B</th><th class="p-4 w-16 text-center">S</th></tr></thead><tbody class="divide-y divide-slate-700">`;
+                let t = `<div class="border border-slate-300 dark:border-slate-700 rounded-2xl overflow-x-auto"><table class="w-full text-sm min-w-[400px]"><thead class="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold border-b border-slate-300 dark:border-slate-700"><tr><th class="p-4 text-left">Pernyataan</th><th class="p-4 w-16 text-center">B</th><th class="p-4 w-16 text-center">S</th></tr></thead><tbody class="divide-y divide-slate-200 dark:divide-slate-700">`;
                 q.opsi.forEach((o, i) => {
                     const tIdx = o.originalIndex !== undefined ? o.originalIndex : i;
                     const val = savedVal ? savedVal[tIdx] : null;
-                    t += `<tr class="hover:bg-slate-800/50 transition-colors"><td class="p-4 text-slate-300">${o.text}</td><td class="p-4 text-center"><input type="radio" name="bs_${i}" class="w-5 h-5 accent-emerald-500" ${val==='true'?'checked':''} onchange="saveBsAns(${tIdx}, 'true')"></td><td class="p-4 text-center"><input type="radio" name="bs_${i}" class="w-5 h-5 accent-red-500" ${val==='false'?'checked':''} onchange="saveBsAns(${tIdx}, 'false')"></td></tr>`;
+                    t += `<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"><td class="p-4 text-slate-700 dark:text-slate-300">${o.text}</td><td class="p-4 text-center"><input type="radio" name="bs_${i}" class="w-5 h-5 accent-emerald-500" ${val==='true'?'checked':''} onchange="saveBsAns(${tIdx}, 'true')"></td><td class="p-4 text-center"><input type="radio" name="bs_${i}" class="w-5 h-5 accent-red-500" ${val==='false'?'checked':''} onchange="saveBsAns(${tIdx}, 'false')"></td></tr>`;
                 });
                 containerO.innerHTML = t + `</tbody></table></div>`;
             } else if(q.type === 'pgk') {
@@ -1165,16 +1041,16 @@
                     const tIdx = o.originalIndex;
                     const isSel = sel.includes(tIdx);
                     const div = document.createElement('div');
-                    div.className = `flex items-center gap-4 p-4 border rounded-2xl cursor-pointer transition-all ${isSel ? 'border-primary bg-primary/10 shadow-[0_0_15px_rgba(56,189,248,0.2)]' : 'border-slate-700 bg-slate-800/30 hover:bg-slate-800'}`;
+                    div.className = `flex items-center gap-4 p-4 border rounded-2xl cursor-pointer transition-all ${isSel ? 'border-primary bg-primary/10 shadow-[0_0_15px_rgba(56,189,248,0.2)]' : 'bg-white dark:bg-slate-800/30 border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800'}`;
                     div.onclick = () => {
                         let n = [...sel]; if(n.includes(tIdx)) n = n.filter(x=>x!==tIdx); else n.push(tIdx); saveAns(n);
                     };
-                    div.innerHTML = `<div class="w-6 h-6 rounded-md border-2 flex items-center justify-center transition-all ${isSel ? 'bg-primary border-primary' : 'border-slate-500'}">${isSel ? '<svg class="w-4 h-4 text-slate-900" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg>' : ''}</div><div class="flex-1 text-slate-300 font-medium">${o.text}</div>`;
+                    div.innerHTML = `<div class="w-6 h-6 rounded-md border-2 flex items-center justify-center transition-all ${isSel ? 'bg-primary border-primary' : 'border-slate-400 dark:border-slate-500'}">${isSel ? '<svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg>' : ''}</div><div class="flex-1 text-slate-700 dark:text-slate-300 font-medium group-hover:text-slate-900 dark:group-hover:text-white">${o.text}</div>`;
                     containerO.appendChild(div);
                 });
             } else {
                 const ta = document.createElement('textarea');
-                ta.className = "glow-input w-full p-5 rounded-2xl h-40 text-base leading-relaxed";
+                ta.className = "glow-input w-full p-5 rounded-2xl h-40 text-base leading-relaxed bg-white dark:bg-slate-800/50 text-slate-800 dark:text-white border border-slate-300 dark:border-slate-600 outline-none focus:ring-2 ring-primary";
                 ta.placeholder = "Ketik jawaban...";
                 ta.value = savedVal || '';
                 ta.oninput = (e) => saveAns(e.target.value);
@@ -1182,11 +1058,11 @@
 
                 if(q.type === 'esai-kompleks') {
                     const camDiv = document.createElement('div');
-                    camDiv.className = "mt-6 pt-6 border-t border-white/10";
+                    camDiv.className = "mt-6 pt-6 border-t border-slate-200 dark:border-white/10";
                     const uid = `cam-${idx}`;
                     
                     camDiv.innerHTML = `<label for="${uid}" class="cursor-pointer px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 rounded-xl text-white text-sm font-bold flex items-center gap-2 w-max transition-all shadow-lg" onclick="window.setUploading(true)"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path></svg> Foto Jawaban</label><input type="file" id="${uid}" accept="image/*" class="hidden" capture="environment">
-                    <div id="preview-${idx}" class="${ans.image ? 'mt-4' : 'mt-4 hidden'}">${ans.image ? `<div class="relative inline-block group"><img src="${ans.image}" class="h-40 rounded-xl border border-white/20 shadow-lg"><button onclick="delImg(${idx})" class="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1.5 shadow-md"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button></div>` : ''}</div>`;
+                    <div id="preview-${idx}" class="${ans.image ? 'mt-4' : 'mt-4 hidden'}">${ans.image ? `<div class="relative inline-block group"><img src="${ans.image}" class="h-40 rounded-xl border border-slate-300 dark:border-white/20 shadow-lg"><button onclick="delImg(${idx})" class="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1.5 shadow-md"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button></div>` : ''}</div>`;
                     containerO.appendChild(camDiv);
                     setTimeout(() => {
                         const fi = document.getElementById(uid);
@@ -1195,7 +1071,7 @@
                                 const base64 = await new Promise(r=>{ const fr=new FileReader(); fr.onload=x=>r(x.target.result); fr.readAsDataURL(e.target.files[0]); });
                                 const comp = await compressImage(base64);
                                 saveImg(idx, comp);
-                                document.getElementById(`preview-${idx}`).innerHTML = `<div class="relative inline-block group"><img src="${comp}" class="h-40 rounded-xl border border-white/20 shadow-lg"><button onclick="delImg(${idx})" class="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1.5 shadow-md"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button></div>`;
+                                document.getElementById(`preview-${idx}`).innerHTML = `<div class="relative inline-block group"><img src="${comp}" class="h-40 rounded-xl border border-slate-300 dark:border-white/20 shadow-lg"><button onclick="delImg(${idx})" class="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1.5 shadow-md"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button></div>`;
                                 document.getElementById(`preview-${idx}`).classList.remove('hidden');
                             }
                             window.setUploading(false);
@@ -1286,7 +1162,7 @@
                 const b = document.createElement('button'); b.textContent = i+1;
                 const a = answers[i];
                 const has = (a.val !== null && a.val !== undefined && a.val !== '' && (typeof a.val !== 'object' || Object.keys(a.val).length > 0)) || (a.image && a.image.length > 0);
-                b.className = `w-full aspect-square rounded-xl flex items-center justify-center text-xs font-bold text-white transition-all ${a.ragu ? 'bg-warning text-black' : (has ? 'bg-success' : 'bg-slate-700')}`;
+                b.className = `w-full aspect-square rounded-xl flex items-center justify-center text-xs font-bold text-slate-800 dark:text-white transition-all ${a.ragu ? 'bg-warning text-black' : (has ? 'bg-success text-white' : 'bg-slate-200 dark:bg-slate-700')}`;
                 b.onclick = () => { closeSummary(); loadQuestion(i); };
                 g.appendChild(b);
             });
@@ -1394,15 +1270,7 @@
             });
         }
 
-        function switchScreen(id) {
-            ['screen-login', 'screen-dashboard', 'screen-token', 'screen-exam', 'screen-result'].forEach(s => {
-                const el = document.getElementById(s);
-                if (el) el.classList.add('hidden');
-            });
-            const target = document.getElementById(id);
-            if (target) target.classList.remove('hidden');
-        }
-		function showLoading(show, text="MEMUAT...") { 
+        function showLoading(show, text="MEMUAT...") { 
             const el = document.getElementById('loading-overlay');
             const txt = el.querySelector('div.font-mono'); 
             if(txt) txt.innerText = text;
