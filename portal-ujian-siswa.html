@@ -50,7 +50,6 @@
                 radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.1) 0px, transparent 50%),
                 radial-gradient(at 100% 100%, rgba(129, 140, 248, 0.1) 0px, transparent 50%);
         }
-        /* PREMIUM GLASS STYLE (DUAL MODE) */
         .glass-panel {
             background: rgba(255, 255, 255, 0.75);
             backdrop-filter: blur(20px);
@@ -161,6 +160,14 @@
                 </button>
                 <p class="text-xs text-slate-500 mt-4">Silakan panggil pengawas untuk membuka kunci.</p>
             </div>
+        </div>
+    </div>
+
+    <div id="fullscreen-blocker" class="fixed inset-0 z-[9999] bg-black flex-col items-center justify-center hidden">
+        <div class="p-8 text-center glass-panel rounded-3xl border border-white/10">
+            <h2 class="text-2xl font-bold text-white mb-4">LAYAR PENUH DIPERLUKAN</h2>
+            <p class="text-slate-400 mb-8">Klik tombol di bawah untuk melanjutkan ujian.</p>
+            <button onclick="requestFullScreenAgain()" class="px-8 py-3 bg-gradient-to-r from-primary to-accent text-white font-bold rounded-xl shadow-lg">LANJUTKAN</button>
         </div>
     </div>
 
@@ -506,15 +513,17 @@
             if(qOptions) qOptions.style.fontSize = `${currentFontSize}%`;
         };
         
-        // --- SUPER SECURITY SYSTEM (ANTI-CHEAT) FIXED ---
+        // --- SUPER SECURITY SYSTEM (ANTI-CHEAT) - VERSI REVISI KETAT ---
+        
         function getCheatLimit() {
             if (!examData) return 3;
-            return (examData.maxCurang !== undefined && examData.maxCurang !== null && examData.maxCurang !== "") ? parseInt(examData.maxCurang) : 3;
+            // FIX: Pastikan angka 0 terbaca sebagai angka, bukan sebagai data kosong
+            let limit = parseInt(examData.maxCurang);
+            return isNaN(limit) ? 3 : limit;
         }
 
         function updateCheatCount() {
             const now = Date.now();
-            // JEDA PENDINGIN (COOLDOWN) 3 Detik: Menghentikan lompatan ganda saat split-screen
             if (now - lastCheatTime < 3000) return false; 
             
             lastCheatTime = now;
@@ -528,59 +537,50 @@
             return true;
         }
 
-        function checkSecurityStatus() {
-            const limit = getCheatLimit();
-            if (cheatCount > limit) {
-                document.getElementById('warning-modal').classList.add('hidden');
-                document.getElementById('warning-modal').classList.remove('flex');
-                
-                const blocker = document.getElementById('fullscreen-blocker');
-                if(blocker) blocker.style.display = 'none';
-                
-                document.getElementById('lock-modal').classList.remove('hidden');
-                document.getElementById('lock-modal').classList.add('flex');
-            }
-        }
-
         function triggerWarning(reasonTitle, reasonText) {
+            // JANGAN deteksi jika sedang proses upload foto
+            if (window.isUploading) return;
+
             const isAdded = updateCheatCount();
             if (isAdded) {
                 const limit = getCheatLimit();
-                if (cheatCount <= limit) {
+                
+                // FIX: Jika limit 0, maka pelanggaran ke-1 (cheatCount=1) harus LANGSUNG GEMBOK
+                if (cheatCount > limit) {
+                    document.getElementById('warning-modal').classList.add('hidden');
+                    document.getElementById('warning-modal').classList.remove('flex');
+                    document.getElementById('lock-modal').classList.remove('hidden');
+                    document.getElementById('lock-modal').classList.add('flex');
+                } else {
                     document.getElementById('warning-title').innerText = reasonTitle;
                     document.getElementById('warning-text').innerText = reasonText;
                     document.getElementById('violation-count-display').textContent = cheatCount;
-                    
-                    const blocker = document.getElementById('fullscreen-blocker');
-                    if(blocker) blocker.style.display = 'none';
-
                     document.getElementById('warning-modal').classList.remove('hidden');
                     document.getElementById('warning-modal').classList.add('flex');
-                } else {
-                    checkSecurityStatus(); 
                 }
             }
         }
 
+        // DETEKTOR 1: Pindah Tab
         document.addEventListener("visibilitychange", () => {
             if (window.isUploading || isSubmitting || document.getElementById('screen-exam').classList.contains('hidden')) return;
             if (document.hidden) triggerWarning("GANTI TAB / MINIMIZE!", "Anda terdeteksi meninggalkan halaman ujian.");
         });
 
+        // DETEKTOR 2: Klik Aplikasi Lain (Kalkulator/WA)
         window.addEventListener("blur", () => {
             if (window.isUploading || isSubmitting || document.getElementById('screen-exam').classList.contains('hidden')) return;
-            triggerWarning("FOKUS HILANG!", "Anda terdeteksi membuka aplikasi melayang atau notifikasi.");
+            // Beri jeda 500ms untuk memastikan ini bukan karena klik tombol foto
+            setTimeout(() => {
+                if (!window.isUploading) triggerWarning("FOKUS HILANG!", "Anda terdeteksi membuka aplikasi lain.");
+            }, 500);
         });
 
+        // DETEKTOR 3: Keluar Layar Penuh
         const handleFullscreenChange = () => {
-            if (isSubmitting || window.isUploading || document.getElementById('screen-exam').classList.contains('hidden')) return;
-            
-            const isSupported = document.fullscreenEnabled || document.webkitFullscreenEnabled;
+            if (window.isUploading || isSubmitting || document.getElementById('screen-exam').classList.contains('hidden')) return;
             const isFull = document.fullscreenElement || document.webkitFullscreenElement;
-            
-            if (isSupported && !isFull) {
-                triggerWarning("LAYAR PENUH BATAL!", "Anda keluar dari layar penuh atau melakukan Split-Screen.");
-            }
+            if (!isFull) triggerWarning("LAYAR PENUH BATAL!", "Jangan keluar dari mode layar penuh.");
         };
 
         window.addEventListener("resize", () => {
@@ -1061,20 +1061,30 @@
                     camDiv.className = "mt-6 pt-6 border-t border-slate-200 dark:border-white/10";
                     const uid = `cam-${idx}`;
                     
-                    camDiv.innerHTML = `<label for="${uid}" class="cursor-pointer px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 rounded-xl text-white text-sm font-bold flex items-center gap-2 w-max transition-all shadow-lg" onclick="window.setUploading(true)"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path></svg> Foto Jawaban</label><input type="file" id="${uid}" accept="image/*" class="hidden" capture="environment">
+                    camDiv.innerHTML = `<label for="${uid}" class="cursor-pointer px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 rounded-xl text-white text-sm font-bold flex items-center gap-2 w-max transition-all shadow-lg" onclick="window.setUploading(true);"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path></svg> Foto Jawaban</label><input type="file" id="${uid}" accept="image/*" class="hidden" capture="environment">
                     <div id="preview-${idx}" class="${ans.image ? 'mt-4' : 'mt-4 hidden'}">${ans.image ? `<div class="relative inline-block group"><img src="${ans.image}" class="h-40 rounded-xl border border-slate-300 dark:border-white/20 shadow-lg"><button onclick="delImg(${idx})" class="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1.5 shadow-md"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button></div>` : ''}</div>`;
                     containerO.appendChild(camDiv);
                     setTimeout(() => {
                         const fi = document.getElementById(uid);
                         if(fi) fi.onchange = async (e) => {
                             if(e.target.files[0]) {
+                                window.setUploading(true);
                                 const base64 = await new Promise(r=>{ const fr=new FileReader(); fr.onload=x=>r(x.target.result); fr.readAsDataURL(e.target.files[0]); });
                                 const comp = await compressImage(base64);
                                 saveImg(idx, comp);
                                 document.getElementById(`preview-${idx}`).innerHTML = `<div class="relative inline-block group"><img src="${comp}" class="h-40 rounded-xl border border-slate-300 dark:border-white/20 shadow-lg"><button onclick="delImg(${idx})" class="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1.5 shadow-md"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button></div>`;
                                 document.getElementById(`preview-${idx}`).classList.remove('hidden');
+                                setTimeout(() => {
+                                    try {
+                                        if (!document.fullscreenElement) {
+                                            document.documentElement.requestFullscreen().catch(err => console.log(err));
+                                        }
+                                    } catch(err) {}
+                                    window.setUploading(false);
+                                }, 1000);
+                            } else {
+                                window.setUploading(false);
                             }
-                            window.setUploading(false);
                         };
                     }, 100);
                 }
