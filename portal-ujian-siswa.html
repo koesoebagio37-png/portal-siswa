@@ -312,8 +312,8 @@
                     <span class="w-2 h-2 rounded-full bg-success animate-pulse"></span> ONLINE
                 </div>
                 <div class="text-right ml-1">
-                    <span class="text-[9px] md:text-[10px] text-slate-500 dark:text-slate-400 uppercase font-bold tracking-widest block mb-0.5">Sisa Waktu</span>
-                    <div id="timer-display" class="font-mono text-base md:text-3xl font-bold text-slate-800 dark:text-white tracking-tight drop-shadow-md">00:00:00</div>
+                    <span class="text-[8px] md:text-[10px] text-slate-500 dark:text-slate-400 uppercase font-bold tracking-widest block mb-0.5">Sisa Waktu</span>
+                    <div id="timer-display" class="font-mono text-sm sm:text-base md:text-3xl font-bold text-slate-800 dark:text-white tracking-tighter drop-shadow-md">00:00:00</div>
                 </div>
             </div>
         </header>
@@ -461,13 +461,7 @@
 
         // --- SISTEM UPLOAD AMAN ---
         window.setUploading = (status) => {
-            if (status) {
-                window.isUploading = true;
-                clearTimeout(uploadTimeout);
-            } else {
-                clearTimeout(uploadTimeout);
-                uploadTimeout = setTimeout(() => { window.isUploading = false; }, 3000); 
-            }
+            window.isUploading = status; 
         };
 
         // --- THEME TOGGLE LOGIC ---
@@ -513,11 +507,9 @@
             if(qOptions) qOptions.style.fontSize = `${currentFontSize}%`;
         };
         
-        // --- SUPER SECURITY SYSTEM (ANTI-CHEAT) - VERSI REVISI KETAT ---
-        
+        // --- SUPER SECURITY SYSTEM (ANTI-CHEAT) FIXED ---
         function getCheatLimit() {
             if (!examData) return 3;
-            // FIX: Pastikan angka 0 terbaca sebagai angka, bukan sebagai data kosong
             let limit = parseInt(examData.maxCurang);
             return isNaN(limit) ? 3 : limit;
         }
@@ -537,50 +529,73 @@
             return true;
         }
 
+        function checkSecurityStatus() {
+            const limit = getCheatLimit();
+            if (cheatCount > limit) {
+                document.getElementById('warning-modal').classList.add('hidden');
+                document.getElementById('warning-modal').classList.remove('flex');
+                
+                const blocker = document.getElementById('fullscreen-blocker');
+                if(blocker) blocker.style.display = 'none';
+                
+                document.getElementById('lock-modal').classList.remove('hidden');
+                document.getElementById('lock-modal').classList.add('flex');
+            }
+        }
+
         function triggerWarning(reasonTitle, reasonText) {
-            // JANGAN deteksi jika sedang proses upload foto
-            if (window.isUploading) return;
+            if (window.isUploading) return; // Aman dari false alarm saat kamera menyala
 
             const isAdded = updateCheatCount();
             if (isAdded) {
                 const limit = getCheatLimit();
-                
-                // FIX: Jika limit 0, maka pelanggaran ke-1 (cheatCount=1) harus LANGSUNG GEMBOK
-                if (cheatCount > limit) {
-                    document.getElementById('warning-modal').classList.add('hidden');
-                    document.getElementById('warning-modal').classList.remove('flex');
-                    document.getElementById('lock-modal').classList.remove('hidden');
-                    document.getElementById('lock-modal').classList.add('flex');
-                } else {
+                if (cheatCount <= limit) {
                     document.getElementById('warning-title').innerText = reasonTitle;
                     document.getElementById('warning-text').innerText = reasonText;
                     document.getElementById('violation-count-display').textContent = cheatCount;
+                    
+                    const blocker = document.getElementById('fullscreen-blocker');
+                    if(blocker) blocker.style.display = 'none';
+
                     document.getElementById('warning-modal').classList.remove('hidden');
                     document.getElementById('warning-modal').classList.add('flex');
+                } else {
+                    checkSecurityStatus(); 
                 }
             }
         }
 
-        // DETEKTOR 1: Pindah Tab
         document.addEventListener("visibilitychange", () => {
             if (window.isUploading || isSubmitting || document.getElementById('screen-exam').classList.contains('hidden')) return;
             if (document.hidden) triggerWarning("GANTI TAB / MINIMIZE!", "Anda terdeteksi meninggalkan halaman ujian.");
         });
 
-        // DETEKTOR 2: Klik Aplikasi Lain (Kalkulator/WA)
         window.addEventListener("blur", () => {
             if (window.isUploading || isSubmitting || document.getElementById('screen-exam').classList.contains('hidden')) return;
-            // Beri jeda 500ms untuk memastikan ini bukan karena klik tombol foto
             setTimeout(() => {
-                if (!window.isUploading) triggerWarning("FOKUS HILANG!", "Anda terdeteksi membuka aplikasi lain.");
+                if (!window.isUploading) triggerWarning("FOKUS HILANG!", "Anda terdeteksi membuka aplikasi melayang atau notifikasi.");
             }, 500);
         });
 
-        // DETEKTOR 3: Keluar Layar Penuh
         const handleFullscreenChange = () => {
-            if (window.isUploading || isSubmitting || document.getElementById('screen-exam').classList.contains('hidden')) return;
+            if (isSubmitting || document.getElementById('screen-exam').classList.contains('hidden')) return;
+            
+            const isSupported = document.fullscreenEnabled || document.webkitFullscreenEnabled;
             const isFull = document.fullscreenElement || document.webkitFullscreenElement;
-            if (!isFull) triggerWarning("LAYAR PENUH BATAL!", "Jangan keluar dari mode layar penuh.");
+            
+            if (isSupported && !isFull) {
+                if (window.isUploading) {
+                    // AMAN: Layar penuh batal karena membuka Kamera HP. Minta siswa klik Lanjutkan.
+                    const blocker = document.getElementById('fullscreen-blocker');
+                    if(blocker) {
+                        blocker.querySelector('h2').innerText = "AKSES KAMERA SELESAI";
+                        blocker.querySelector('p').innerText = "Sistem menutup layar penuh sementara untuk membuka kamera. Klik LANJUTKAN untuk kembali ke ujian.";
+                        blocker.style.display = 'flex';
+                    }
+                } else {
+                    triggerWarning("LAYAR PENUH BATAL!", "Anda keluar dari layar penuh atau melakukan Split-Screen.");
+                }
+            }
         };
 
         window.addEventListener("resize", () => {
@@ -591,12 +606,37 @@
         document.addEventListener("fullscreenchange", handleFullscreenChange);
         document.addEventListener("webkitfullscreenchange", handleFullscreenChange);
 
-        window.onfocus = () => { setTimeout(() => window.isUploading = false, 1000); };
+        window.addEventListener('focus', () => {
+            // Mematikan isUploading jika siswa menekan tombol batal pada saat pilih foto
+            setTimeout(() => {
+                if (window.isUploading) {
+                    const isFull = document.fullscreenElement || document.webkitFullscreenElement;
+                    if (isFull) window.isUploading = false;
+                }
+            }, 1000);
+        });
         
         window.dismissWarning = () => {
             document.getElementById('warning-modal').classList.add('hidden');
             document.getElementById('warning-modal').classList.remove('flex');
             document.documentElement.requestFullscreen().catch(e=>{});
+        };
+
+        window.requestFullScreenAgain = () => {
+            document.documentElement.requestFullscreen().catch(e=>{});
+            const blocker = document.getElementById('fullscreen-blocker');
+            if(blocker) blocker.style.display = 'none';
+            
+            // Kembalikan teks asli untuk jaga-jaga
+            setTimeout(() => {
+                if(blocker) {
+                    blocker.querySelector('h2').innerText = "LAYAR PENUH DIPERLUKAN";
+                    blocker.querySelector('p').innerText = "Klik tombol di bawah untuk melanjutkan ujian.";
+                }
+            }, 1000);
+            
+            // Matikan mode upload agar sistem detektor curang aktif kembali
+            window.isUploading = false;
         };
 
         window.attemptUnlock = () => {
@@ -1074,14 +1114,7 @@
                                 saveImg(idx, comp);
                                 document.getElementById(`preview-${idx}`).innerHTML = `<div class="relative inline-block group"><img src="${comp}" class="h-40 rounded-xl border border-slate-300 dark:border-white/20 shadow-lg"><button onclick="delImg(${idx})" class="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1.5 shadow-md"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button></div>`;
                                 document.getElementById(`preview-${idx}`).classList.remove('hidden');
-                                setTimeout(() => {
-                                    try {
-                                        if (!document.fullscreenElement) {
-                                            document.documentElement.requestFullscreen().catch(err => console.log(err));
-                                        }
-                                    } catch(err) {}
-                                    window.setUploading(false);
-                                }, 1000);
+                                // TIDAK ADA PEMAKSAAN FULLSCREEN DI SINI LAGI, DIALIHKAN KE TOMBOL LANJUTKAN
                             } else {
                                 window.setUploading(false);
                             }
