@@ -96,6 +96,12 @@
         html.dark .soal-text { color: #f1f5f9; }
         .soal-text img { max-width: 100%; border-radius: 12px; margin: 1.5rem auto; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
         html.dark .soal-text img { border-color: #334155; }
+		/* PERBAIKAN TABEL AGAR BERGARIS */
+        .soal-text table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.9em; }
+        .soal-text th, .soal-text td { border: 1px solid #cbd5e1; padding: 0.75rem; text-align: left; }
+        html.dark .soal-text th, html.dark .soal-text td { border-color: #475569; }
+        .soal-text th { background-color: #f1f5f9; font-weight: bold; }
+        html.dark .soal-text th { background-color: #1e293b; }
         
         .nav-grid-btn {
             background: rgba(0,0,0,0.03);
@@ -312,8 +318,8 @@
                     <span class="w-2 h-2 rounded-full bg-success animate-pulse"></span> ONLINE
                 </div>
                 <div class="text-right ml-2 flex-shrink-0">
-                    <span class="hidden md:block text-[10px] text-slate-500 dark:text-slate-400 uppercase font-bold tracking-widest mb-0.5">Sisa Waktu</span>
-                    <div id="timer-display" class="font-mono text-lg md:text-3xl font-bold text-slate-800 dark:text-white tracking-tighter drop-shadow-md bg-slate-200 dark:bg-slate-800 md:bg-transparent px-3 py-1.5 md:px-0 md:py-0 rounded-lg">00:00:00</div>
+                    <span class="block text-[8px] md:text-[10px] text-slate-500 dark:text-slate-400 uppercase font-bold tracking-widest mb-0.5">Sisa Waktu</span>
+                    <div id="timer-display" class="font-mono text-lg sm:text-xl md:text-3xl font-bold text-slate-800 dark:text-white tracking-tighter drop-shadow-md bg-slate-200 dark:bg-slate-800 md:bg-transparent px-3 py-1 md:px-0 md:py-0 rounded-lg">00:00:00</div>
                 </div>
             </div>
         </header>
@@ -372,12 +378,31 @@
     </div>
 
     <div id="mobile-nav-overlay" class="fixed inset-0 z-40 bg-black/80 backdrop-blur-sm hidden flex-col justify-end md:hidden animate-fade-in" onclick="if(event.target===this) toggleMobileNav()">
-        <div class="bg-white dark:bg-surface border-t border-slate-200 dark:border-white/10 p-6 rounded-t-3xl max-h-[70vh] overflow-y-auto">
+        <div class="bg-white dark:bg-surface border-t border-slate-200 dark:border-white/10 p-6 rounded-t-3xl max-h-[80vh] overflow-y-auto">
             <div class="flex justify-between items-center mb-6">
-                <h3 class="text-slate-800 dark:text-white font-bold tracking-tight">Daftar Soal</h3>
+                <h3 class="text-slate-800 dark:text-white font-bold tracking-tight">Navigasi Ujian</h3>
                 <button onclick="toggleMobileNav()" class="p-2 bg-slate-100 dark:bg-slate-800 rounded-full text-slate-500 dark:text-slate-400">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
+            </div>
+            
+            <div class="flex items-center justify-between bg-slate-50 dark:bg-slate-800/50 p-3 rounded-2xl mb-6 border border-slate-200 dark:border-white/5">
+                <div class="flex items-center gap-3">
+                    <button onclick="window.toggleTheme()" class="flex p-2 bg-white dark:bg-slate-700 rounded-xl text-slate-500 dark:text-slate-400 hover:text-primary shadow-sm border border-slate-200 dark:border-slate-600" title="Ganti Mode">
+                        <svg class="w-5 h-5 dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+                        <svg class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                    </button>
+                    <span class="text-xs font-bold text-slate-600 dark:text-slate-300">Tampilan</span>
+                </div>
+                <div class="flex items-center gap-1 bg-white dark:bg-slate-700 rounded-xl p-1 border border-slate-200 dark:border-slate-600 shadow-sm">
+                    <button onclick="resizeFont(-10)" class="w-8 h-8 flex items-center justify-center text-slate-500 dark:text-slate-300 font-bold">-</button>
+                    <div class="w-px h-4 bg-slate-200 dark:bg-slate-600"></div>
+                    <button onclick="resizeFont(10)" class="w-8 h-8 flex items-center justify-center text-slate-500 dark:text-slate-300 font-bold">+</button>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <span class="text-[10px] uppercase font-bold tracking-widest text-slate-400">Daftar Soal</span>
             </div>
             <div id="mobile-nav-grid" class="grid grid-cols-5 gap-3"></div>
         </div>
