@@ -242,19 +242,19 @@
 
                 if (docSnap.exists()) {
                     const data = docSnap.data();
+
+                    // LOGIKA BARU: CEK APAKAH WA SUDAH TERISI
+                    if (data.hp_ortu && data.hp_ortu.trim() !== "") {
+                        alert("NOMOR WA SUDAH TERDAFTAR!\n\nAnda hanya dapat mengirim data satu kali. Silakan melapor ke Wali Kelas jika Anda ingin mereset/mengganti nomor WA.");
+                        document.getElementById('student-nis').value = '';
+                        return; // Hentikan proses di sini
+                    }
+
                     currentStudentId = nisInput;
                     
                     document.getElementById('display-name').innerText = data.nama || "Siswa Tanpa Nama";
                     document.getElementById('display-class').innerText = data.kelas || "Kelas -";
-                    
-                    // Pre-fill jika sudah ada no hp sebelumnya
-                    if(data.hp_ortu) {
-                        // Hapus +62 atau 0 di depan untuk tampilan
-                        let existing = data.hp_ortu.replace(/^(\+62|62|0)/, '');
-                        document.getElementById('parent-wa').value = existing;
-                    } else {
-                        document.getElementById('parent-wa').value = '';
-                    }
+                    document.getElementById('parent-wa').value = ''; // Kosongkan inputan
 
                     document.getElementById('step-1').classList.add('hidden');
                     document.getElementById('step-2').classList.remove('hidden');
